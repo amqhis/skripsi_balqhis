@@ -5,21 +5,36 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
 import xgboost as xgb
+from streamlit_option_menu import option_menu
 
-# Tambahkan konfigurasi Streamlit untuk styling
+# Konfigurasi halaman Streamlit
 st.set_page_config(
     page_title="Insight Predict",
     page_icon="📊",
     layout="wide",
     initial_sidebar_state="expanded"
 )
-# Panggil fungsi CSS di awal main()
+
+# Fungsi untuk memuat CSS kustom
+def local_css():
+    st.markdown(
+        """
+        <style>
+            .logo-container img {
+                display: block;
+                margin: auto;
+            }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+# Fungsi utama
 def main():
-    local_css()  # Tambahkan ini di awal fungsi main
-    
-    # Sisanya tetap sama seperti kode sebelumnya
+    local_css()  # Memanggil CSS
+
+    # Sidebar dengan menu
     with st.sidebar:
-        # Tambahkan class 'logo-container' untuk logo
         st.markdown(
             """
             <div class='logo-container'>
@@ -32,36 +47,35 @@ def main():
             unsafe_allow_html=True
         )
         
-        # Styling option menu dengan warna yang lebih menarik
+        # Menu navigasi
         selected = option_menu(None, 
-                           ['About', 'Upload Data', 'Preprocessing', 
-                            'PSO and K-Medoids Results'],
-                           menu_icon='cast',
-                           icons=['house', 'cloud-upload', 'gear', 'graph-up'],
-                           default_index=0,
-                           styles={
-                               "container": {
-                                   "padding": "0px", 
-                                   "background-color": "#f8f9fa"
-                               },
-                               "icon": {
-                                   "color": "#3498db", 
-                                   "font-size": "17px"
-                               }, 
-                               "nav-link": {
-                                   "font-size": "15px", 
-                                   "text-align": "left", 
-                                   "margin":"1px", 
-                                   "color": "#2c3e50",
-                                   "--hover-color": "#e9ecef"
-                               },
-                               "nav-link-selected": {
-                                   "background-color": "#3498db", 
-                                   "color": "white"
-                               },
-                           })
+                               ['About', 'Upload Data', 'Preprocessing', 
+                                'PSO and K-Medoids Results'],
+                               menu_icon='cast',
+                               icons=['house', 'cloud-upload', 'gear', 'graph-up'],
+                               default_index=0,
+                               styles={
+                                   "container": {
+                                       "padding": "0px", 
+                                       "background-color": "#f8f9fa"
+                                   },
+                                   "icon": {
+                                       "color": "#3498db", 
+                                       "font-size": "17px"
+                                   }, 
+                                   "nav-link": {
+                                       "font-size": "15px", 
+                                       "text-align": "left", 
+                                       "margin":"1px", 
+                                       "color": "#2c3e50",
+                                       "--hover-color": "#e9ecef"
+                                   },
+                                   "nav-link-selected": {
+                                       "background-color": "#3498db", 
+                                       "color": "white"
+                                   },
+                               })
 
-
-# Define valid columns globally
-VALID_COLUMNS = ['ID', 'PEKERJAAN', 'JUMLAH ASET MOBIL', 'JUMLAH ASET MOTOR', 
-                 'JUMLAH ASET RUMAH/TANAH/SAWAH', 'PENDAPATAN']
+# Menjalankan aplikasi
+if __name__ == "__main__":
+    main()
