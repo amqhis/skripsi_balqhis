@@ -1,24 +1,71 @@
 import streamlit as st
 
-# Mengatur warna background halaman
-page_bg_color = """
-<style>
-[data-testid="stAppViewContainer"] {
-    background-color: #d4edda;
-}
-[data-testid="stHeader"] {
-    background-color: #155724;
-}
-</style>
-"""
-st.markdown(page_bg_color, unsafe_allow_html=True)
+# Set page configuration
+st.set_page_config(page_title="Good Prediction", layout="wide")
 
-# Menampilkan judul aplikasi
-st.title("🌱 Good Prediction")
-
-# Deskripsi aplikasi
-st.write(
-    "Selamat datang di aplikasi *Good Prediction*! "
-    "Aplikasi ini dirancang untuk melakukan prediksi menggunakan model XGBoost dengan optimasi Grid Search. "
-    "Gunakan fitur yang tersedia untuk mengunggah data, memprosesnya, dan mendapatkan hasil prediksi yang akurat."
+# Custom CSS for styling
+st.markdown(
+    """
+    <style>
+        .main {
+            background-color: #d4edda;
+        }
+        .sidebar {
+            background-color: #155724;
+            padding: 20px;
+            height: 100vh;
+            color: white;
+        }
+        .sidebar h1 {
+            text-align: center;
+        }
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .sidebar a:hover {
+            background-color: #1e7e34;
+        }
+    </style>
+    """,
+    unsafe_allow_html=True,
 )
+
+# Layout with two columns
+col1, col2 = st.columns([1, 3])
+
+# Sidebar (Left Section)
+with col1:
+    st.markdown('<div class="sidebar">', unsafe_allow_html=True)
+    st.markdown("<h1>Good Prediction</h1>", unsafe_allow_html=True)
+    option = st.radio(
+        "Pilih Fitur:",
+        ["Tentang Aplikasi", "Upload Data", "Preprocessing Data", "Visualisasi Data Historis", "Prediksi Masa Depan"],
+    )
+    st.markdown("</div>", unsafe_allow_html=True)
+
+# Main Content (Right Section)
+with col2:
+    if option == "Tentang Aplikasi":
+        st.header("Tentang Aplikasi")
+        st.write("Aplikasi ini digunakan untuk melakukan prediksi penjualan menggunakan model XGBoost.")
+
+    elif option == "Upload Data":
+        st.header("Upload Data")
+        st.write("Silakan upload file CSV untuk memulai analisis.")
+
+    elif option == "Preprocessing Data":
+        st.header("Preprocessing Data")
+        st.write("Melakukan pembersihan dan transformasi data sebelum analisis.")
+
+    elif option == "Visualisasi Data Historis":
+        st.header("Visualisasi Data Historis")
+        st.write("Menampilkan grafik berdasarkan data historis.")
+
+    elif option == "Prediksi Masa Depan":
+        st.header("Prediksi Masa Depan")
+        st.write("Melakukan prediksi jumlah penjualan untuk periode mendatang.")
+
