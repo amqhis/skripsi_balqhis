@@ -37,12 +37,18 @@ def local_css():
             }
 
             .logo-container img {
-                width: 120px;
+                width: 100px;
             }
 
-            /* Styling untuk menu navigasi */
-            .css-1v0mbdj.eknhn3m4 {
-                color: #2c3e50 !important;
+            /* Styling untuk teks sambutan */
+            .welcome-text {
+                font-size: 22px;
+                font-weight: bold;
+                color: #4a4a4a;
+                text-align: center;
+                background-color: #f5deb3;
+                padding: 15px;
+                border-radius: 10px;
             }
         </style>
         """,
@@ -95,6 +101,57 @@ def main():
                 },
             }
         )
+
+    # **📌 Pesan sambutan di homepage**
+    if selected == 'Tentang Aplikasi':
+        st.title('📊 Insight Predict')
+        st.write("""
+        **Selamat datang di Insight Predict!**  
+        Aplikasi ini dibuat untuk membantu menganalisis dan memprediksi tren data menggunakan metode berbasis Machine Learning.  
+        Dengan fitur yang interaktif, Insight Predict akan mempermudah pengguna dalam memahami pola data historis dan melakukan prediksi masa depan dengan lebih akurat.
+        """)
+        
+        # **📌 Terms & Conditions**
+        with st.expander("📜 Syarat & Ketentuan Penggunaan"):
+            st.markdown("""
+            **Jenis Data yang Dapat Digunakan:**  
+            - Format **Excel (.xlsx)**
+            - Harus memiliki kolom berikut:  
+                - **ID**  
+                - **Pekerjaan**  
+                - **Jumlah Aset Mobil**  
+                - **Jumlah Aset Motor**  
+                - **Jumlah Aset Rumah/Tanah/Sawah**  
+                - **Pendapatan**  
+            """)
+
+    elif selected == 'Upload Data':
+        st.title('📂 Upload Data Anda')
+        uploaded_file = st.file_uploader("Pilih file Excel (.xlsx) untuk dianalisis", type=['xlsx'])
+
+        if uploaded_file is not None:
+            # Membaca file Excel
+            df = pd.read_excel(uploaded_file)
+            st.write("### 📊 Data yang Diupload")
+            st.dataframe(df)
+            # Menyimpan ke session state
+            st.session_state['original_data'] = df
+            st.success('✅ Data berhasil diunggah!')
+
+    elif selected == 'Preprocessing Data':
+        st.title("⚙️ Preprocessing Data")
+        st.write("Fitur ini akan digunakan untuk membersihkan dan mempersiapkan data sebelum dilakukan analisis lebih lanjut.")
+        st.warning("🚧 Fitur ini masih dalam tahap pengembangan.")
+
+    elif selected == 'Visualisasi Data Historis':
+        st.title("📈 Visualisasi Data Historis")
+        st.write("Di sini, Anda akan melihat tren data berdasarkan histori yang telah diunggah.")
+        st.warning("🚧 Fitur ini masih dalam tahap pengembangan.")
+
+    elif selected == 'Prediksi Masa Depan':
+        st.title("🔮 Prediksi Masa Depan")
+        st.write("Gunakan model Machine Learning untuk memprediksi tren di masa depan.")
+        st.warning("🚧 Fitur ini masih dalam tahap pengembangan.")
 
 # Menjalankan aplikasi
 if __name__ == "__main__":
