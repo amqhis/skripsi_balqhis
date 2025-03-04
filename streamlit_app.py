@@ -216,8 +216,56 @@ def main():
 
     elif selected == '🔮 Prediksi Masa Depan':
         st.title("🔮 Prediksi Masa Depan")
-        st.write("Gunakan model Machine Learning untuk memprediksi tren di masa depan.")
-        st.warning("🚧 Fitur ini masih dalam tahap pengembangan.")
+        if 'processed_data' in st.session_state:
+            df = st.session_state['processed_data']
+            df_monthly = df.groupby(['Year', 'Month'])['Quantity'].sum().reset_index()
+            
+            # Normalisasi Data
+            scaler = MinMaxScaler()
+            df_monthly['Quantity_Scaled'] = scaler.fit_transform(df_monthly[['Quantity']])
+            
+            # Persiapan Data untuk Model
+            X = df_monthly[['Year', 'Month']]
+            y = df_monthly['Quantity_Scaled']
+            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=False)
+            
+            # Training Model XGBoost
+            model = xgb.XGBRegressor(objective='reg:squarederror', n_estimators=100, learning_rate=0.1)
+            model.fit(X_train, y_train)
+            
+            # Prediksi Masa Depan
+            future_dates = pd.DataFrame({
+                'Year': np.repeat(range(2024, 2026), 12),
+                'Month': list(range(1, 13)) * 2
+            })
+            
+            future_pred_scaled = model.predict(future_dates)
+            future_pred_actual = scaler.inverse_transform(future_pred_scaled.reshape(-1, 1)).flatten()
+            
+            future_results = pd.DataFrame({
+                'Year': future_dates['Year'].values,
+                'Month': future_dates['Month'].values,
+                'Predicted_Quantity': future_pred_actual
+            })
+            
+            # Visualisasi Prediksi
+            st.subheader("📈 Prediksi Penjualan 2024-2025")
+            future_results['Date'] = pd.to_datetime(future_results[['Year', 'Month']].assign(day=1))
+            fig, ax = plt.subplots(figsize=(12, 6))
+            ax.plot(df_monthly['Date'], df_monthly['Quantity'], label="Data Historis", marker='o', color='blue')
+            ax.plot(future_results['Date'], future_results['Predicted_Quantity'], label="Prediksi 2024-2025", marker='s', color='red')
+            ax.set_xlabel("Bulan")
+            ax.set_ylabel("Total Quantity")
+            ax.set_title("Prediksi Kuantitas Januari 2024 - Desember 2025")
+            ax.legend()
+            ax.grid()
+            st.pyplot(fig)
+            
+            st.write("### 📋 Tabel Hasil Prediksi")
+            st.dataframe(future_results)
+        else:
+            st.warning("⚠️ Silakan lakukan preprocessing data terlebih dahulu!")
+
 
 # Menjalankan aplikasi
 if __name__ == "__main__":
