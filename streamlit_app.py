@@ -179,7 +179,7 @@ def main():
             st.pyplot(fig)
             
             # Menyimpan hasil preprocessing
-            st.session_state['preprocessed_data'] = df_scaled
+            st.session_state['processed_data'] = df_scaled
         else:
             st.warning("⚠️ Harap unggah data terlebih dahulu di bagian '📂 Upload Data'.")
 
@@ -221,7 +221,7 @@ def main():
         # Debugging: Tampilkan data yang ada di session state
         st.write("Session State Keys:", st.session_state.keys())
     
-        if 'processed_data' in st.session_state:
+        if 'processed_data' in st.session_state and not st.session_state['processed_data'].empty:
             df = st.session_state['processed_data']
     
             # Pastikan ada data historis yang benar
