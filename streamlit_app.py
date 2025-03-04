@@ -118,7 +118,7 @@ def main():
 
     # **📌 Tentang Aplikasi**
     elif selected == '📖 Tentang Aplikasi':
-        st.title('📊 Insight Predict - Analisis Data Cerdas')
+        st.title('📊 Insight Predict')
         st.write("""
         Insight Predict adalah platform analisis berbasis data yang dirancang untuk membantu pengguna dalam memahami tren data dan membuat prediksi berdasarkan data historis.  
         Aplikasi ini menggunakan **model Machine Learning canggih** untuk memberikan hasil prediksi yang lebih akurat dan dapat diandalkan. Dengan visualisasi interaktif, pengguna dapat dengan mudah menginterpretasikan data, mengevaluasi hasil analisis, dan mengambil keputusan berbasis data dengan lebih baik.
