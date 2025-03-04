@@ -20,9 +20,29 @@ def local_css():
     st.markdown(
         """
         <style>
+            /* Mengatur sidebar */
+            [data-testid="stSidebar"] {
+                background-color: #cdd4b1;
+            }
+            
+            /* Mengatur background main content */
+            [data-testid="stAppViewContainer"] {
+                background-color: #feecd0;
+            }
+
+            /* Mengatur logo agar lebih kecil dan di tengah */
+            .logo-container {
+                text-align: center;
+                margin-top: -20px;
+            }
+
             .logo-container img {
-                display: block;
-                margin: auto;
+                width: 120px;
+            }
+
+            /* Styling untuk menu navigasi */
+            .css-1v0mbdj.eknhn3m4 {
+                color: #2c3e50 !important;
             }
         </style>
         """,
@@ -33,48 +53,48 @@ def local_css():
 def main():
     local_css()  # Memanggil CSS
 
-    # Sidebar dengan menu
+    # Sidebar dengan menu navigasi
     with st.sidebar:
         st.markdown(
             """
             <div class='logo-container'>
-                <img src="https://raw.githubusercontent.com/amqhis/skripsi_balqhis/main/Logo Insight Predict.png" 
-                     alt="Logo" 
-                     width="250" 
-                     style="margin-top: 0;">
+                <img src="https://raw.githubusercontent.com/amqhis/skripsi_balqhis/main/Logo%20Insight%20Predict.png" 
+                     alt="Logo">
             </div>
             """,
             unsafe_allow_html=True
         )
         
         # Menu navigasi
-        selected = option_menu(None, 
-                               ['About', 'Upload Data', 'Preprocessing', 
-                                'PSO and K-Medoids Results'],
-                               menu_icon='cast',
-                               icons=['house', 'cloud-upload', 'gear', 'graph-up'],
-                               default_index=0,
-                               styles={
-                                   "container": {
-                                       "padding": "0px", 
-                                       "background-color": "#f8f9fa"
-                                   },
-                                   "icon": {
-                                       "color": "#3498db", 
-                                       "font-size": "17px"
-                                   }, 
-                                   "nav-link": {
-                                       "font-size": "15px", 
-                                       "text-align": "left", 
-                                       "margin":"1px", 
-                                       "color": "#2c3e50",
-                                       "--hover-color": "#e9ecef"
-                                   },
-                                   "nav-link-selected": {
-                                       "background-color": "#3498db", 
-                                       "color": "white"
-                                   },
-                               })
+        selected = option_menu(
+            None,
+            ['Tentang Aplikasi', 'Upload Data', 'Preprocessing Data', 
+             'Visualisasi Data Historis', 'Prediksi Masa Depan'],
+            menu_icon='cast',
+            icons=['info-circle', 'cloud-upload', 'filter', 'bar-chart', 'line-chart'],
+            default_index=0,
+            styles={
+                "container": {
+                    "padding": "0px",
+                    "background-color": "#cdd4b1"
+                },
+                "icon": {
+                    "color": "#2c3e50",
+                    "font-size": "17px"
+                },
+                "nav-link": {
+                    "font-size": "15px",
+                    "text-align": "left",
+                    "margin": "5px",
+                    "color": "#2c3e50",
+                    "--hover-color": "#b5c19a"
+                },
+                "nav-link-selected": {
+                    "background-color": "#6b8e23",
+                    "color": "white"
+                },
+            }
+        )
 
 # Menjalankan aplikasi
 if __name__ == "__main__":
