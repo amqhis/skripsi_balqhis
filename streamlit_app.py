@@ -151,8 +151,37 @@ def main():
 
     elif selected == '⚙️ Preprocessing Data':
         st.title("⚙️ Preprocessing Data")
-        st.write("Fitur ini akan digunakan untuk membersihkan dan mempersiapkan data sebelum dilakukan analisis lebih lanjut.")
-        st.warning("🚧 Fitur ini masih dalam tahap pengembangan.")
+        if 'original_data' in st.session_state:
+            df = st.session_state['original_data'].copy()
+            
+            st.write("### 📌 Data Sebelum Preprocessing")
+            st.dataframe(df)
+
+            # Menghapus nilai yang kosong
+            df.dropna(inplace=True)
+            
+            # Normalisasi dengan MinMaxScaler
+            scaler = MinMaxScaler()
+            df_scaled = df.copy()
+            numeric_cols = df.select_dtypes(include=[np.number]).columns
+            df_scaled[numeric_cols] = scaler.fit_transform(df[numeric_cols])
+            
+            st.write("### ✅ Data Setelah Preprocessing")
+            st.dataframe(df_scaled)
+            
+            # Visualisasi data setelah normalisasi
+            st.write("### 📊 Visualisasi Distribusi Data Setelah Normalisasi")
+            fig, ax = plt.subplots(figsize=(10, 5))
+            for col in numeric_cols:
+                ax.plot(df_scaled[col], label=col)
+            ax.set_title("Distribusi Data Setelah Normalisasi")
+            ax.legend()
+            st.pyplot(fig)
+            
+            # Menyimpan hasil preprocessing
+            st.session_state['preprocessed_data'] = df_scaled
+        else:
+            st.warning("⚠️ Harap unggah data terlebih dahulu di bagian '📂 Upload Data'.")
 
     elif selected == '📊 Visualisasi Data Historis':
         st.title("📈 Visualisasi Data Historis")
