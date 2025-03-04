@@ -16,14 +16,14 @@ st.set_page_config(
 # Panggil fungsi CSS di awal main()
 def main():
     local_css()  # Tambahkan ini di awal fungsi main
-
+    
     # Sisanya tetap sama seperti kode sebelumnya
     with st.sidebar:
         # Tambahkan class 'logo-container' untuk logo
         st.markdown(
             """
             <div class='logo-container'>
-                <img src="Logo Insight Predict.png" 
+                <img src="https://raw.githubusercontent.com/Auliaafitriani/SkripsiAulia/main/LogoPriorityAid.png" 
                      alt="Logo" 
                      width="250" 
                      style="margin-top: 0;">
@@ -62,3 +62,6 @@ def main():
                            })
 
 
+# Define valid columns globally
+VALID_COLUMNS = ['ID', 'PEKERJAAN', 'JUMLAH ASET MOBIL', 'JUMLAH ASET MOTOR', 
+                 'JUMLAH ASET RUMAH/TANAH/SAWAH', 'PENDAPATAN']
