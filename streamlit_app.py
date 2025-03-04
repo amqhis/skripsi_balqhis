@@ -236,9 +236,6 @@ def main():
     elif selected == '🔮 Prediksi Masa Depan':
         st.title("🔮 Prediksi Masa Depan")
     
-        # Debugging: Tampilkan data yang ada di session state
-        st.write("Session State Keys:", st.session_state.keys())
-    
         if 'processed_data' in st.session_state and not st.session_state['processed_data'].empty:
             df = st.session_state['processed_data']
     
