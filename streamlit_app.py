@@ -74,10 +74,10 @@ def main():
         # Menu navigasi
         selected = option_menu(
             None,
-            ['Tentang Aplikasi', 'Upload Data', 'Preprocessing Data', 
-             'Visualisasi Data Historis', 'Prediksi Masa Depan'],
+            ['🏠 Home', '📖 Tentang Aplikasi', '📂 Upload Data', 
+             '⚙️ Preprocessing Data', '📊 Visualisasi Data Historis', '🔮 Prediksi Masa Depan'],
             menu_icon='cast',
-            icons=['info-circle', 'cloud-upload', 'filter', 'bar-chart', 'line-chart'],
+            icons=['house', 'info-circle', 'cloud-upload', 'filter', 'bar-chart', 'line-chart'],
             default_index=0,
             styles={
                 "container": {
@@ -102,15 +102,25 @@ def main():
             }
         )
 
-    # **📌 Pesan sambutan di homepage**
-    if selected == 'Tentang Aplikasi':
-        st.title('📊 Insight Predict')
+    # **📌 Kata Sambutan Muncul di Homepage**
+    if selected == '🏠 Home':
+        st.markdown("<div class='welcome-text'>🎉 Hai, Selamat Datang di Insight Predict! 🎉</div>", unsafe_allow_html=True)
         st.write("""
-        **Selamat datang di Insight Predict!**  
-        Aplikasi ini dibuat untuk membantu menganalisis dan memprediksi tren data menggunakan metode berbasis Machine Learning.  
-        Dengan fitur yang interaktif, Insight Predict akan mempermudah pengguna dalam memahami pola data historis dan melakukan prediksi masa depan dengan lebih akurat.
+        Insight Predict adalah aplikasi yang dirancang untuk membantu Anda menganalisis dan memprediksi tren data menggunakan metode berbasis **Machine Learning**.  
+        Dengan fitur interaktif yang mudah digunakan, aplikasi ini memungkinkan Anda memahami pola data historis dan melakukan prediksi masa depan dengan lebih akurat.  
+        📊 **Ayo mulai jelajahi fitur yang tersedia!** 🚀
         """)
+
+    # **📌 Tentang Aplikasi**
+    elif selected == '📖 Tentang Aplikasi':
+        st.title('📊 Insight Predict - Analisis Data Cerdas')
+        st.write("""
+        Insight Predict adalah platform analisis berbasis data yang dirancang untuk membantu pengguna dalam memahami tren data dan membuat prediksi berdasarkan data historis.  
+        Aplikasi ini menggunakan **model Machine Learning canggih** untuk memberikan hasil prediksi yang lebih akurat dan dapat diandalkan.  
         
+        Dengan visualisasi interaktif, pengguna dapat dengan mudah menginterpretasikan data, mengevaluasi hasil analisis, dan mengambil keputusan berbasis data dengan lebih baik.
+        """)
+
         # **📌 Terms & Conditions**
         with st.expander("📜 Syarat & Ketentuan Penggunaan"):
             st.markdown("""
@@ -125,7 +135,8 @@ def main():
                 - **Pendapatan**  
             """)
 
-    elif selected == 'Upload Data':
+    # **📌 Fitur Upload Data**
+    elif selected == '📂 Upload Data':
         st.title('📂 Upload Data Anda')
         uploaded_file = st.file_uploader("Pilih file Excel (.xlsx) untuk dianalisis", type=['xlsx'])
 
@@ -138,17 +149,17 @@ def main():
             st.session_state['original_data'] = df
             st.success('✅ Data berhasil diunggah!')
 
-    elif selected == 'Preprocessing Data':
+    elif selected == '⚙️ Preprocessing Data':
         st.title("⚙️ Preprocessing Data")
         st.write("Fitur ini akan digunakan untuk membersihkan dan mempersiapkan data sebelum dilakukan analisis lebih lanjut.")
         st.warning("🚧 Fitur ini masih dalam tahap pengembangan.")
 
-    elif selected == 'Visualisasi Data Historis':
+    elif selected == '📊 Visualisasi Data Historis':
         st.title("📈 Visualisasi Data Historis")
         st.write("Di sini, Anda akan melihat tren data berdasarkan histori yang telah diunggah.")
         st.warning("🚧 Fitur ini masih dalam tahap pengembangan.")
 
-    elif selected == 'Prediksi Masa Depan':
+    elif selected == '🔮 Prediksi Masa Depan':
         st.title("🔮 Prediksi Masa Depan")
         st.write("Gunakan model Machine Learning untuk memprediksi tren di masa depan.")
         st.warning("🚧 Fitur ini masih dalam tahap pengembangan.")
