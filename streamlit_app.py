@@ -38,7 +38,7 @@ def main():
         st.markdown(
             """
             <div class='logo-container'>
-                <img src="https://raw.githubusercontent.com/Auliaafitriani/SkripsiAulia/main/LogoPriorityAid.png" 
+                <img src="https://raw.githubusercontent.com/amqhis/skripsi_balqhis/main/Logo Insight Predict.png" 
                      alt="Logo" 
                      width="250" 
                      style="margin-top: 0;">
