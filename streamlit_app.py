@@ -40,6 +40,11 @@ def local_css():
                 width: 100px;
             }
 
+            /* Styling untuk teks agar lebih kontras */
+            h1, h2, h3, h4, h5, h6, p, div, span {
+                color: #4a4a4a !important;
+            }
+
             /* Styling untuk teks sambutan */
             .welcome-text {
                 font-size: 22px;
@@ -85,14 +90,14 @@ def main():
                     "background-color": "#cdd4b1"
                 },
                 "icon": {
-                    "color": "#2c3e50",
+                    "color": "#4a4a4a",
                     "font-size": "17px"
                 },
                 "nav-link": {
                     "font-size": "15px",
                     "text-align": "left",
                     "margin": "5px",
-                    "color": "#2c3e50",
+                    "color": "#4a4a4a",
                     "--hover-color": "#b5c19a"
                 },
                 "nav-link-selected": {
@@ -116,9 +121,7 @@ def main():
         st.title('📊 Insight Predict - Analisis Data Cerdas')
         st.write("""
         Insight Predict adalah platform analisis berbasis data yang dirancang untuk membantu pengguna dalam memahami tren data dan membuat prediksi berdasarkan data historis.  
-        Aplikasi ini menggunakan **model Machine Learning canggih** untuk memberikan hasil prediksi yang lebih akurat dan dapat diandalkan.  
-        
-        Dengan visualisasi interaktif, pengguna dapat dengan mudah menginterpretasikan data, mengevaluasi hasil analisis, dan mengambil keputusan berbasis data dengan lebih baik.
+        Aplikasi ini menggunakan **model Machine Learning canggih** untuk memberikan hasil prediksi yang lebih akurat dan dapat diandalkan. Dengan visualisasi interaktif, pengguna dapat dengan mudah menginterpretasikan data, mengevaluasi hasil analisis, dan mengambil keputusan berbasis data dengan lebih baik.
         """)
 
         # **📌 Terms & Conditions**
@@ -127,12 +130,9 @@ def main():
             **Jenis Data yang Dapat Digunakan:**  
             - Format **Excel (.xlsx)**
             - Harus memiliki kolom berikut:  
-                - **ID**  
-                - **Pekerjaan**  
-                - **Jumlah Aset Mobil**  
-                - **Jumlah Aset Motor**  
-                - **Jumlah Aset Rumah/Tanah/Sawah**  
-                - **Pendapatan**  
+                - **Tanggal**  
+                - **Jenis Produk**  
+                - **Quantity**   
             """)
 
     # **📌 Fitur Upload Data**
