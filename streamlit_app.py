@@ -160,18 +160,18 @@ def main():
             st.dataframe(df)
     
             # **1️⃣ Validasi Kolom yang Diperlukan**
-            required_columns = ['Tanggal', 'Quantity']
+            required_columns = ['Tanggal Pembelian', 'Quantity']
             missing_cols = [col for col in required_columns if col not in df.columns]
             if missing_cols:
                 st.error(f"⚠️ Kolom berikut tidak ditemukan dalam data: {', '.join(missing_cols)}")
             else:
                 # **2️⃣ Konversi 'Tanggal' ke Datetime**
-                df['Tanggal'] = pd.to_datetime(df['Tanggal'], errors='coerce')
-                df.dropna(subset=['Tanggal'], inplace=True)
+                df['Tanggal Pembelian'] = pd.to_datetime(df['Tanggal Pembelian'], errors='coerce')
+                df.dropna(subset=['Tanggal Pembelian'], inplace=True)
     
                 # **3️⃣ Ekstrak Tahun & Bulan**
-                df['Year'] = df['Tanggal'].dt.year
-                df['Month'] = df['Tanggal'].dt.month
+                df['Year'] = df['Tanggal Pembelian'].dt.year
+                df['Month'] = df['Tanggal Pembelian'].dt.month
     
                 # **4️⃣ Menghapus Nilai Kosong**
                 df.dropna(inplace=True)
@@ -190,9 +190,9 @@ def main():
                 # **7️⃣ Visualisasi Data Setelah Normalisasi**
                 st.write("### 📊 Visualisasi Distribusi Data Setelah Normalisasi")
                 fig, ax = plt.subplots(figsize=(10, 5))
-                ax.plot(df['Tanggal'], df['Quantity'], label="Quantity Normalized", color="blue")
+                ax.plot(df['Tanggal Pembelian'], df['Quantity'], label="Quantity Normalized", color="blue")
                 ax.set_title("Distribusi Data Setelah Normalisasi")
-                ax.set_xlabel("Tanggal")
+                ax.set_xlabel("Tanggal Pembelian")
                 ax.set_ylabel("Quantity (Scaled)")
                 ax.legend()
                 st.pyplot(fig)
