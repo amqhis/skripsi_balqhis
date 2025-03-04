@@ -151,54 +151,54 @@ def main():
 
 
     elif selected == '⚙️ Preprocessing Data':
-    st.title("⚙️ Preprocessing Data")
-    
-    if 'original_data' in st.session_state:
-        df = st.session_state['original_data'].copy()
+        st.title("⚙️ Preprocessing Data")
         
-        st.write("### 📌 Data Sebelum Preprocessing")
-        st.dataframe(df)
-
-        # **1️⃣ Validasi Kolom yang Diperlukan**
-        required_columns = ['Tanggal', 'Quantity']
-        missing_cols = [col for col in required_columns if col not in df.columns]
-        if missing_cols:
-            st.error(f"⚠️ Kolom berikut tidak ditemukan dalam data: {', '.join(missing_cols)}")
-        else:
-            # **2️⃣ Konversi 'Tanggal' ke Datetime**
-            df['Tanggal'] = pd.to_datetime(df['Tanggal'], errors='coerce')
-            df.dropna(subset=['Tanggal'], inplace=True)
-
-            # **3️⃣ Ekstrak Tahun & Bulan**
-            df['Year'] = df['Tanggal'].dt.year
-            df['Month'] = df['Tanggal'].dt.month
-
-            # **4️⃣ Menghapus Nilai Kosong**
-            df.dropna(inplace=True)
-
-            # **5️⃣ Normalisasi dengan MinMaxScaler**
-            scaler = MinMaxScaler()
-            numeric_cols = ['Quantity']  # Pastikan hanya 'Quantity' yang dinormalisasi
-            df[numeric_cols] = scaler.fit_transform(df[numeric_cols])
-
-            st.write("### ✅ Data Setelah Preprocessing")
+        if 'original_data' in st.session_state:
+            df = st.session_state['original_data'].copy()
+            
+            st.write("### 📌 Data Sebelum Preprocessing")
             st.dataframe(df)
-
-            # **6️⃣ Simpan Hasil Preprocessing ke Session State**
-            st.session_state['processed_data'] = df
-
-            # **7️⃣ Visualisasi Data Setelah Normalisasi**
-            st.write("### 📊 Visualisasi Distribusi Data Setelah Normalisasi")
-            fig, ax = plt.subplots(figsize=(10, 5))
-            ax.plot(df['Tanggal'], df['Quantity'], label="Quantity Normalized", color="blue")
-            ax.set_title("Distribusi Data Setelah Normalisasi")
-            ax.set_xlabel("Tanggal")
-            ax.set_ylabel("Quantity (Scaled)")
-            ax.legend()
-            st.pyplot(fig)
-
-    else:
-        st.warning("⚠️ Harap unggah data terlebih dahulu di bagian '📂 Upload Data'.")
+    
+            # **1️⃣ Validasi Kolom yang Diperlukan**
+            required_columns = ['Tanggal', 'Quantity']
+            missing_cols = [col for col in required_columns if col not in df.columns]
+            if missing_cols:
+                st.error(f"⚠️ Kolom berikut tidak ditemukan dalam data: {', '.join(missing_cols)}")
+            else:
+                # **2️⃣ Konversi 'Tanggal' ke Datetime**
+                df['Tanggal'] = pd.to_datetime(df['Tanggal'], errors='coerce')
+                df.dropna(subset=['Tanggal'], inplace=True)
+    
+                # **3️⃣ Ekstrak Tahun & Bulan**
+                df['Year'] = df['Tanggal'].dt.year
+                df['Month'] = df['Tanggal'].dt.month
+    
+                # **4️⃣ Menghapus Nilai Kosong**
+                df.dropna(inplace=True)
+    
+                # **5️⃣ Normalisasi dengan MinMaxScaler**
+                scaler = MinMaxScaler()
+                numeric_cols = ['Quantity']  # Pastikan hanya 'Quantity' yang dinormalisasi
+                df[numeric_cols] = scaler.fit_transform(df[numeric_cols])
+    
+                st.write("### ✅ Data Setelah Preprocessing")
+                st.dataframe(df)
+    
+                # **6️⃣ Simpan Hasil Preprocessing ke Session State**
+                st.session_state['processed_data'] = df
+    
+                # **7️⃣ Visualisasi Data Setelah Normalisasi**
+                st.write("### 📊 Visualisasi Distribusi Data Setelah Normalisasi")
+                fig, ax = plt.subplots(figsize=(10, 5))
+                ax.plot(df['Tanggal'], df['Quantity'], label="Quantity Normalized", color="blue")
+                ax.set_title("Distribusi Data Setelah Normalisasi")
+                ax.set_xlabel("Tanggal")
+                ax.set_ylabel("Quantity (Scaled)")
+                ax.legend()
+                st.pyplot(fig)
+    
+        else:
+            st.warning("⚠️ Harap unggah data terlebih dahulu di bagian '📂 Upload Data'.")
 
     
     elif selected == '📊 Visualisasi Data Historis':
