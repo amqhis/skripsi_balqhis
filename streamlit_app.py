@@ -184,9 +184,35 @@ def main():
             st.warning("⚠️ Harap unggah data terlebih dahulu di bagian '📂 Upload Data'.")
 
     elif selected == '📊 Visualisasi Data Historis':
-        st.title("📈 Visualisasi Data Historis")
-        st.write("Di sini, Anda akan melihat tren data berdasarkan histori yang telah diunggah.")
-        st.warning("🚧 Fitur ini masih dalam tahap pengembangan.")
+        st.title("Visualisasi Data Historis")
+        if 'original_data' in st.session_state:
+            df = st.session_state['original_data']
+            df['Month'] = df['Tanggal Pembelian'].dt.to_period('M').astype(str)
+            df_monthly = df.groupby('Month')['Quantity'].sum().reset_index()
+            max_month = df_monthly.loc[df_monthly['Quantity'].idxmax()]
+            min_month = df_monthly.loc[df_monthly['Quantity'].idxmin()]
+            st.write(f"Penjualan tertinggi terjadi pada {max_month['Month']} sebanyak {max_month['Quantity']} unit")
+            st.write(f"Penjualan terendah terjadi pada {min_month['Month']} sebanyak {min_month['Quantity']} unit")
+            fig, ax = plt.subplots(figsize=(12,6))
+            ax.plot(df_monthly['Month'], df_monthly['Quantity'], marker='o', linestyle='-', color='b')
+            plt.xticks(rotation=45)
+            plt.title('Tren Penjualan Per Bulan')
+            st.pyplot(fig)
+            
+            df_yearly = df.groupby(df['Tanggal Pembelian'].dt.year)['Quantity'].sum()
+            fig, ax = plt.subplots()
+            df_yearly.plot(kind='bar', color='skyblue', ax=ax)
+            plt.title('Total Penjualan per Tahun')
+            st.pyplot(fig)
+            
+            sales_by_type = df.groupby('Jenis Strapping Band')['Quantity'].sum()
+            fig, ax = plt.subplots()
+            sales_by_type.plot(kind='bar', color='green', ax=ax)
+            plt.title('Penjualan Berdasarkan Jenis Strapping Band')
+            plt.xticks(rotation=45)
+            st.pyplot(fig)
+        else:
+            st.warning("Upload data terlebih dahulu!")
 
     elif selected == '🔮 Prediksi Masa Depan':
         st.title("🔮 Prediksi Masa Depan")
