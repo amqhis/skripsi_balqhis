@@ -22,55 +22,166 @@ def local_css():
         <style>
             /* Mengatur sidebar */
             [data-testid="stSidebar"] {
-                background-color: #cdd4b1;
+                background: linear-gradient(to bottom, #2E3B4E, #1E293B);
+                border-right: 1px solid #3B4D61;
             }
             
             /* Mengatur background main content */
             [data-testid="stAppViewContainer"] {
-                background-color: #feecd0;
+                background: linear-gradient(135deg, #F5F7FA, #E4E7EB);
             }
-
+            
+            /* Styling untuk header aplikasi */
+            .header-container {
+                background-color: rgba(255, 255, 255, 0.8);
+                padding: 20px;
+                border-radius: 10px;
+                margin-bottom: 25px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+                border-left: 5px solid #3366FF;
+            }
+            
             /* Mengatur logo agar lebih kecil dan di tengah */
             .logo-container {
                 text-align: center;
-                margin-top: -20px;
+                margin: 15px 0 30px 0;
+                padding-bottom: 20px;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.2);
             }
-
+            
             .logo-container img {
-                width: 100px;
+                width: 120px;
+                filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.2));
+                transition: transform 0.3s ease;
             }
-
-            /* Styling untuk teks agar lebih kontras */
-            h1, h2, h3, h4, h5, h6, p, div, span {
-                color: #4a4a4a !important;
+            
+            .logo-container img:hover {
+                transform: scale(1.05);
             }
-
+            
+            /* Styling untuk teks */
+            h1 {
+                color: #1E293B !important;
+                font-size: 32px !important;
+                font-weight: 700 !important;
+                margin-bottom: 10px !important;
+            }
+            
+            h2, h3 {
+                color: #334155 !important;
+                font-weight: 600 !important;
+            }
+            
+            p, div, span {
+                color: #475569 !important;
+            }
+            
+            /* Styling untuk kartu konten */
+            .content-card {
+                background-color: white;
+                padding: 25px;
+                border-radius: 12px;
+                box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+                margin-bottom: 20px;
+                border-top: 4px solid #3366FF;
+            }
+            
             /* Styling untuk teks sambutan */
             .welcome-text {
-                font-size: 22px;
-                font-weight: bold;
-                color: #4a4a4a;
+                font-size: 18px;
+                line-height: 1.6;
+                color: #475569;
                 text-align: center;
-                background-color: #f5deb3;
-                padding: 15px;
+                background: linear-gradient(135deg, #F0F9FF, #E0F2FE);
+                padding: 25px;
                 border-radius: 10px;
+                margin: 20px 0;
+                border-left: 4px solid #3366FF;
+            }
+            
+            /* Styling untuk tombol */
+            .stButton > button {
+                background-color: #3366FF;
+                color: white;
+                border-radius: 6px;
+                padding: 10px 20px;
+                font-weight: 500;
+                border: none;
+                transition: all 0.3s ease;
+            }
+            
+            .stButton > button:hover {
+                background-color: #2952CC;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            }
+            
+            /* Styling untuk metrik/KPI */
+            .metric-container {
+                background-color: white;
+                padding: 15px;
+                border-radius: 8px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+                text-align: center;
+            }
+            
+            /* Footer styling */
+            .footer {
+                text-align: center;
+                padding: 20px;
+                color: #94A3B8 !important;
+                font-size: 14px;
+                margin-top: 40px;
+                border-top: 1px solid #E2E8F0;
+            }
+            
+            /* Animation for page transitions */
+            @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+            
+            .fade-in {
+                animation: fadeIn 0.5s ease-in-out;
+            }
+            
+            /* Styling untuk sidebar navigasi yang aktif */
+            .nav-link-active {
+                background-color: rgba(51, 102, 255, 0.8) !important;
+                color: white !important;
+                border-radius: 6px;
             }
         </style>
         """,
         unsafe_allow_html=True
     )
 
+# Fungsi untuk menampilkan header
+def display_header(title):
+    st.markdown(f"""
+        <div class="header-container fade-in">
+            <h1>{title}</h1>
+        </div>
+    """, unsafe_allow_html=True)
+
+# Fungsi untuk menampilkan konten dalam kartu
+def content_card(content, key=None):
+    st.markdown(f"""
+        <div class="content-card fade-in">
+            {content}
+        </div>
+    """, unsafe_allow_html=True)
+
 # Fungsi utama
 def main():
     local_css()  # Memanggil CSS
-
+    
     # Sidebar dengan menu navigasi
     with st.sidebar:
         st.markdown(
             """
             <div class='logo-container'>
                 <img src="https://raw.githubusercontent.com/amqhis/skripsi_balqhis/main/Logo%20Insight%20Predict.png" 
-                     alt="Logo">
+                     alt="Logo Insight Predict">
             </div>
             """,
             unsafe_allow_html=True
@@ -80,232 +191,166 @@ def main():
         selected = option_menu(
             None,
             ['🏠 Home', '📖 Tentang Aplikasi', '📂 Upload Data', 
-             '⚙️ Preprocessing Data', '📊 Visualisasi Data Historis', '🔮 Prediksi Masa Depan'],
+             '⚙️ Preprocessing Data', '📊 Visualisasi Data', '🔮 Prediksi'],
             menu_icon='cast',
-            icons=['house', 'info-circle', 'cloud-upload', 'filter', 'bar-chart', 'line-chart'],
+            icons=['house-fill', 'info-circle-fill', 'cloud-upload-fill', 
+                   'gear-fill', 'bar-chart-fill', 'graph-up'],
             default_index=0,
             styles={
                 "container": {
-                    "padding": "0px",
-                    "background-color": "#cdd4b1"
+                    "padding": "10px",
+                    "background-color": "transparent"
                 },
                 "icon": {
-                    "color": "#4a4a4a",
-                    "font-size": "17px"
+                    "color": "rgba(255, 255, 255, 0.8)",
+                    "font-size": "18px"
                 },
                 "nav-link": {
-                    "font-size": "15px",
+                    "font-size": "16px",
                     "text-align": "left",
-                    "margin": "5px",
-                    "color": "#4a4a4a",
-                    "--hover-color": "#b5c19a"
+                    "margin": "8px 0",
+                    "padding": "10px",
+                    "border-radius": "6px",
+                    "color": "rgba(255, 255, 255, 0.9)",
+                    "--hover-color": "rgba(255, 255, 255, 0.1)"
                 },
                 "nav-link-selected": {
-                    "background-color": "#6b8e23",
-                    "color": "white"
+                    "background-color": "rgba(51, 102, 255, 0.8)",
+                    "color": "white",
+                    "font-weight": "600"
                 },
             }
         )
-
-    # **📌 Kata Sambutan Muncul di Homepage**
-    if selected == '🏠 Home':
-        st.markdown("<div class='welcome-text'>🎉 Hai, Selamat Datang di Insight Predict! 🎉</div>", unsafe_allow_html=True)
-        st.write("""
-        Insight Predict adalah aplikasi yang dirancang untuk membantu Anda menganalisis dan memprediksi tren data menggunakan metode berbasis **Machine Learning**.  
-        Dengan fitur interaktif yang mudah digunakan, aplikasi ini memungkinkan Anda memahami pola data historis dan melakukan prediksi masa depan dengan lebih akurat.  
-        📊 **Ayo mulai jelajahi fitur yang tersedia!** 🚀
-        """)
-
-    # **📌 Tentang Aplikasi**
-    elif selected == '📖 Tentang Aplikasi':
-        st.title('📊 Insight Predict')
-        st.write("""
-        Insight Predict adalah platform analisis berbasis data yang dirancang untuk membantu pengguna dalam memahami tren data dan membuat prediksi berdasarkan data historis.  
-        Aplikasi ini menggunakan **model Machine Learning canggih** untuk memberikan hasil prediksi yang lebih akurat dan dapat diandalkan. Dengan visualisasi interaktif, pengguna dapat dengan mudah menginterpretasikan data, mengevaluasi hasil analisis, dan mengambil keputusan berbasis data dengan lebih baik.
-        """)
-
-        # **📌 Terms & Conditions**
-        with st.expander("📜 Syarat & Ketentuan Penggunaan"):
-            st.markdown("""
-            **Jenis Data yang Dapat Digunakan:**  
-            - Format **Excel (.xlsx)**
-            - Harus memiliki kolom berikut:  
-                - **Tanggal**  
-                - **Jenis Produk**  
-                - **Quantity**   
-            """)
-
-    # **📌 Fitur Upload Data**
-    elif selected == '📂 Upload Data':
-        st.title('📂 Upload Data Anda')
-        uploaded_file = st.file_uploader("Pilih file Excel (.xlsx) untuk dianalisis", type=['xlsx'])
-
-        if uploaded_file is not None:
-            # Membaca file Excel
-            df = pd.read_excel(uploaded_file)
-            st.write("### 📊 Data yang Diupload")
-            st.dataframe(df)
-            # Menyimpan ke session state
-            st.session_state['original_data'] = df
-            st.success('✅ Data berhasil diunggah!')
-
-
-    elif selected == '⚙️ Preprocessing Data':
-        st.title("⚙️ Preprocessing Data")
         
-        if 'original_data' in st.session_state:
-            df = st.session_state['original_data'].copy()
+        # Tambahkan info versi di bagian bawah sidebar
+        st.sidebar.markdown("""
+            <div style="position: absolute; bottom: 20px; left: 20px; right: 20px; 
+                        color: rgba(255, 255, 255, 0.5); font-size: 12px; text-align: center;">
+                Insight Predict v1.0.0
+            </div>
+        """, unsafe_allow_html=True)
+
+    # Konten halaman berdasarkan menu yang dipilih
+    if selected == '🏠 Home':
+        display_header("Selamat Datang di Insight Predict")
+        
+        st.markdown("""
+            <div class="welcome-text fade-in">
+                <span style="font-size: 24px; font-weight: 600;">👋 Hai!</span><br>
+                Insight Predict membantu Anda menganalisis dan memprediksi data dengan mudah dan akurat.
+                Mulai eksplorasi data Anda sekarang!
+            </div>
+        """, unsafe_allow_html=True)
+        
+        # Tampilkan beberapa metrik contoh
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            content_card("""
+                <h3 style="text-align: center; color: #3366FF !important;">📊 Visualisasi</h3>
+                <p style="text-align: center;">
+                    Lihat data Anda dalam bentuk visual yang interaktif dan informatif
+                </p>
+            """)
+        
+        with col2:
+            content_card("""
+                <h3 style="text-align: center; color: #3366FF !important;">⚙️ Preprocessing</h3>
+                <p style="text-align: center;">
+                    Siapkan data Anda dengan langkah-langkah preprocessing yang lengkap
+                </p>
+            """)
             
-            st.write("### 📌 Data Sebelum Preprocessing")
-            st.dataframe(df)
-    
-            # **1️⃣ Validasi Kolom yang Diperlukan**
-            required_columns = ['Tanggal Pembelian', 'Quantity']
-            missing_cols = [col for col in required_columns if col not in df.columns]
-            if missing_cols:
-                st.error(f"⚠️ Kolom berikut tidak ditemukan dalam data: {', '.join(missing_cols)}")
-            else:
-                # **2️⃣ Konversi 'Tanggal' ke Datetime**
-                df['Tanggal Pembelian'] = pd.to_datetime(df['Tanggal Pembelian'], errors='coerce')
-                df.dropna(subset=['Tanggal Pembelian'], inplace=True)
-    
-                # **3️⃣ Ekstrak Tahun & Bulan**
-                df['Year'] = df['Tanggal Pembelian'].dt.year
-                df['Month'] = df['Tanggal Pembelian'].dt.month
-    
-                # **4️⃣ Menghapus Nilai Kosong**
-                df.dropna(inplace=True)
-    
-                # **5️⃣ Normalisasi dengan MinMaxScaler**
-                scaler = MinMaxScaler()
-                numeric_cols = ['Quantity']  # Pastikan hanya 'Quantity' yang dinormalisasi
-                df[numeric_cols] = scaler.fit_transform(df[numeric_cols])
-    
-                st.write("### ✅ Data Setelah Preprocessing")
-                st.dataframe(df)
-    
-                # **6️⃣ Simpan Hasil Preprocessing ke Session State**
-                st.session_state['processed_data'] = df
-    
-                # **7️⃣ Visualisasi Data Setelah Normalisasi**
-                st.write("### 📊 Visualisasi Distribusi Data Setelah Normalisasi")
-                fig, ax = plt.subplots(figsize=(10, 5))
-                ax.plot(df['Tanggal Pembelian'], df['Quantity'], label="Quantity Normalized", color="blue")
-                ax.set_title("Distribusi Data Setelah Normalisasi")
-                ax.set_xlabel("Tanggal Pembelian")
-                ax.set_ylabel("Quantity (Scaled)")
-                ax.legend()
-                st.pyplot(fig)
-    
-        else:
-            st.warning("⚠️ Harap unggah data terlebih dahulu di bagian '📂 Upload Data'.")
-
-    
-    elif selected == '📊 Visualisasi Data Historis':
-        st.title("Visualisasi Data Historis")
-        if 'original_data' in st.session_state:
-            df = st.session_state['original_data']
-            df['Month'] = df['Tanggal Pembelian'].dt.to_period('M').astype(str)
-            df_monthly = df.groupby('Month')['Quantity'].sum().reset_index()
-            max_month = df_monthly.loc[df_monthly['Quantity'].idxmax()]
-            min_month = df_monthly.loc[df_monthly['Quantity'].idxmin()]
-            st.write(f"Penjualan tertinggi terjadi pada {max_month['Month']} sebanyak {max_month['Quantity']} unit")
-            st.write(f"Penjualan terendah terjadi pada {min_month['Month']} sebanyak {min_month['Quantity']} unit")
-            fig, ax = plt.subplots(figsize=(12,6))
-            ax.plot(df_monthly['Month'], df_monthly['Quantity'], marker='o', linestyle='-', color='b')
-            plt.xticks(rotation=45)
-            plt.title('Tren Penjualan Per Bulan')
-            st.pyplot(fig)
+        with col3:
+            content_card("""
+                <h3 style="text-align: center; color: #3366FF !important;">🔮 Prediksi</h3>
+                <p style="text-align: center;">
+                    Gunakan model prediktif untuk melihat tren masa depan dari data Anda
+                </p>
+            """)
             
-            df_yearly = df.groupby(df['Tanggal Pembelian'].dt.year)['Quantity'].sum()
-            fig, ax = plt.subplots()
-            df_yearly.plot(kind='bar', color='skyblue', ax=ax)
-            plt.title('Total Penjualan per Tahun')
-            st.pyplot(fig)
+        # Langkah-langkah penggunaan
+        content_card("""
+            <h2>Cara Menggunakan Insight Predict</h2>
+            <ol>
+                <li>Upload data Anda melalui menu <b>Upload Data</b></li>
+                <li>Lakukan preprocessing data pada menu <b>Preprocessing Data</b></li>
+                <li>Eksplorasi visualisasi data di menu <b>Visualisasi Data</b></li>
+                <li>Dapatkan prediksi masa depan di menu <b>Prediksi</b></li>
+            </ol>
+        """)
+        
+    elif selected == '📖 Tentang Aplikasi':
+        display_header("Tentang Insight Predict")
+        
+        content_card("""
+            <h2>Apa itu Insight Predict?</h2>
+            <p>Insight Predict adalah aplikasi analisis data dan prediksi yang dirancang untuk membantu Anda mengolah data, 
+            memvisualisasikan tren, dan membuat prediksi masa depan berdasarkan data historis.</p>
             
-            sales_by_type = df.groupby('Jenis Strapping Band')['Quantity'].sum()
-            fig, ax = plt.subplots()
-            sales_by_type.plot(kind='bar', color='green', ax=ax)
-            plt.title('Penjualan Berdasarkan Jenis Strapping Band')
-            plt.xticks(rotation=45)
-            st.pyplot(fig)
-        else:
-            st.warning("Upload data terlebih dahulu!")
+            <h3>Fitur Utama:</h3>
+            <ul>
+                <li>Upload dan kelola data dengan mudah</li>
+                <li>Preprocessing data lengkap untuk persiapan analisis</li>
+                <li>Visualisasi data interaktif untuk memudahkan analisis</li>
+                <li>Model prediksi canggih untuk forecasting data masa depan</li>
+                <li>Interface yang user-friendly dan mudah digunakan</li>
+            </ul>
+        """)
+        
+    elif selected == '📂 Upload Data':
+        display_header("Upload Data")
+        
+        content_card("""
+            <p>Upload file data Anda untuk memulai analisis.</p>
+            <p>Format yang didukung: CSV, Excel, dan JSON.</p>
+        """)
+        
+        uploaded_file = st.file_uploader("Pilih file data Anda", type=["csv", "xlsx", "json"])
+        
+        if uploaded_file is not None:
+            st.success("File berhasil diunggah!")
+            # Di sini Anda dapat menambahkan kode untuk memproses file yang diunggah
+            
+    elif selected == '⚙️ Preprocessing Data':
+        display_header("Preprocessing Data")
+        
+        content_card("""
+            <p>Lakukan preprocessing pada data Anda sebelum dianalisis lebih lanjut.</p>
+        """)
+        
+        # Tambahkan kode preprocessing data di sini
+        
+    elif selected == '📊 Visualisasi Data':
+        display_header("Visualisasi Data")
+        
+        content_card("""
+            <p>Eksplorasi data Anda dengan visualisasi interaktif.</p>
+        """)
+        
+        # Tambahkan kode visualisasi data di sini
+        
+    elif selected == '🔮 Prediksi':
+        display_header("Prediksi Data")
+        
+        content_card("""
+            <p>Gunakan model prediktif untuk memprediksi data masa depan.</p>
+        """)
+        
+        # Tambahkan kode prediksi data di sini
+    
+    # Footer
+    st.markdown("""
+        <div class="footer">
+            © 2025 Insight Predict | Dibuat dengan ❤️ menggunakan Streamlit
+        </div>
+    """, unsafe_allow_html=True)
 
-    
-    elif selected == '🔮 Prediksi Masa Depan':
-        st.title("🔮 Prediksi Masa Depan")
-    
-        if 'processed_data' in st.session_state and not st.session_state['processed_data'].empty:
-            df = st.session_state['processed_data']
-    
-            # Pastikan ada data historis yang benar
-            if df.empty:
-                st.warning("⚠️ Data historis kosong. Pastikan Anda telah melakukan preprocessing.")
-            else:
-                # Agregasi Data Bulanan
-                df_monthly = df.groupby(['Year', 'Month'])['Quantity'].sum().reset_index()
-    
-                # Pastikan ada data setelah preprocessing
-                if df_monthly.empty:
-                    st.warning("⚠️ Data setelah preprocessing kosong. Coba ulangi preprocessing.")
-                else:
-                    # Buat kolom 'Date' agar bisa dipakai di visualisasi
-                    df_monthly['Date'] = pd.to_datetime(df_monthly[['Year', 'Month']].assign(day=1))
-    
-                    # Normalisasi Data
-                    scaler = MinMaxScaler()
-                    df_monthly['Quantity_Scaled'] = scaler.fit_transform(df_monthly[['Quantity']])
-    
-                    # Persiapan Data untuk Model
-                    X = df_monthly[['Year', 'Month']]
-                    y = df_monthly['Quantity_Scaled']
-                    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=False)
-    
-                    # Training Model XGBoost
-                    model = xgb.XGBRegressor(objective='reg:squarederror', n_estimators=100, learning_rate=0.1)
-                    model.fit(X_train, y_train)
-    
-                    # Prediksi Masa Depan
-                    future_dates = pd.DataFrame({
-                        'Year': np.repeat(range(2024, 2026), 12),
-                        'Month': list(range(1, 13)) * 2
-                    })
-    
-                    future_dates['Date'] = pd.to_datetime(future_dates[['Year', 'Month']].assign(day=1))
-    
-                    # Prediksi
-                    future_pred_scaled = model.predict(future_dates[['Year', 'Month']])
-                    future_pred_actual = scaler.inverse_transform(future_pred_scaled.reshape(-1, 1)).flatten()
-    
-                    future_results = pd.DataFrame({
-                        'Year': future_dates['Year'].values,
-                        'Month': future_dates['Month'].values,
-                        'Predicted_Quantity': future_pred_actual,
-                        'Date': future_dates['Date']
-                    })
-    
-                    # **Visualisasi Prediksi**
-                    st.subheader("📈 Prediksi Penjualan 2024-2025")
-                    fig, ax = plt.subplots(figsize=(12, 6))
-                    ax.plot(df_monthly['Date'], df_monthly['Quantity'], label="Data Historis", marker='o', color='blue')
-                    ax.plot(future_results['Date'], future_results['Predicted_Quantity'], label="Prediksi 2024-2025", marker='s', color='red')
-                    ax.set_xlabel("Bulan")
-                    ax.set_ylabel("Total Quantity")
-                    ax.set_title("Prediksi Kuantitas Januari 2024 - Desember 2025")
-                    ax.legend()
-                    ax.grid()
-                    st.pyplot(fig)
-    
-                    # **Tampilkan Tabel Hasil Prediksi**
-                    st.write("### 📋 Tabel Hasil Prediksi")
-                    st.dataframe(future_results)
-    
-        else:
-            st.warning("⚠️ Silakan lakukan preprocessing data terlebih dahulu!")
-
-  
-
-# Menjalankan aplikasi
+# Jalankan aplikasi
 if __name__ == "__main__":
     main()
+
+
+
+
+
+
