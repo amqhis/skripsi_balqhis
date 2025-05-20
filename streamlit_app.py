@@ -6,6 +6,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
 import xgboost as xgb
 from streamlit_option_menu import option_menu
+from statsmodels.tsa.stattools import acf, pacf
 
 
 # Konfigurasi halaman Streamlit
