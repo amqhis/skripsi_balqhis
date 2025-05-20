@@ -271,6 +271,7 @@ def main():
 
     def prediksi_masa_depan():
         st.title("🔮 Prediksi Masa Depan")
+        prediksi_masa_depan()
     
         if 'processed_data' in st.session_state and not st.session_state['processed_data'].empty:
             df = st.session_state['processed_data']
