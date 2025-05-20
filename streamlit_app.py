@@ -194,11 +194,17 @@ def main():
                 df['Month'] = df['Tanggal Pembelian'].dt.month
                 df_monthly = df.groupby(['Year', 'Month'])[['Quantity']].sum().reset_index()
     
-                # 6️⃣ Visualisasi ACF & PACF
-                st.write("### 🔁 Visualisasi ACF dan PACF")
+                # 6️⃣ Normalisasi (dahulu)
+                scaler = MinMaxScaler()
+                df_monthly['Quantity_Scaled'] = scaler.fit_transform(df_monthly[['Quantity']])
+                st.write("### ✅ Data Setelah Normalisasi")
+                st.dataframe(df_monthly[['Year', 'Month', 'Quantity', 'Quantity_Scaled']])
+    
+                # 7️⃣ Visualisasi ACF & PACF setelah normalisasi
+                st.write("### 🔁 Visualisasi ACF dan PACF (Quantity_Scaled)")
                 lags = 20
-                acf_vals = acf(df_monthly['Quantity'], nlags=lags)
-                pacf_vals = pacf(df_monthly['Quantity'], nlags=lags)
+                acf_vals = acf(df_monthly['Quantity_Scaled'], nlags=lags)
+                pacf_vals = pacf(df_monthly['Quantity_Scaled'], nlags=lags)
                 threshold = 1.96 / np.sqrt(len(df_monthly))
     
                 fig, axes = plt.subplots(1, 2, figsize=(14, 5))
@@ -218,23 +224,18 @@ def main():
                 st.pyplot(fig)
                 st.info("📌 Dari visualisasi ACF dan PACF, lag terbaik yang disarankan adalah **lag 18**.")
     
-                # 7️⃣ Tampilkan Isi Lag 18
+                # 8️⃣ Tampilkan Isi Lag 18 (dari data asli Quantity, bukan Quantity_Scaled)
                 df_monthly['lag_18'] = df_monthly['Quantity'].shift(18)
                 df_lag18 = df_monthly.dropna(subset=['lag_18'])
                 st.write("### 🧾 Data dengan Lag 18")
                 st.dataframe(df_lag18[['Year', 'Month', 'lag_18', 'Quantity']])
-    
-                # 8️⃣ Normalisasi
-                scaler = MinMaxScaler()
-                df_monthly['Quantity_Scaled'] = scaler.fit_transform(df_monthly[['Quantity']])
-                st.write("### ✅ Data Setelah Normalisasi")
-                st.dataframe(df_monthly[['Year', 'Month', 'Quantity', 'Quantity_Scaled']])
     
                 # 9️⃣ Simpan ke Session State
                 st.session_state['processed_data'] = df_monthly
     
         else:
             st.warning("⚠️ Harap unggah data terlebih dahulu di bagian '📂 Upload Data'.")
+
 
     
     elif selected == '📊 Visualisasi Data Historis':
