@@ -271,43 +271,31 @@ def main():
 
     def prediksi_masa_depan():
         st.title("🔮 Prediksi Masa Depan")
-        prediksi_masa_depan()
     
         if 'processed_data' in st.session_state and not st.session_state['processed_data'].empty:
             df = st.session_state['processed_data']
     
-            # Pastikan data bulanan sudah ada
             if df.empty:
                 st.warning("⚠️ Data historis kosong. Pastikan preprocessing sudah dilakukan.")
                 return
-            
-            # Gunakan kolom 'Year', 'Month', 'Quantity' dari df processed_data
-            df_monthly = df[['Year', 'Month', 'Quantity']].copy()
     
-            # Buat kolom tanggal (DateTime)
+            df_monthly = df[['Year', 'Month', 'Quantity']].copy()
             df_monthly['Date'] = pd.to_datetime(df_monthly[['Year', 'Month']].assign(DAY=1))
             df_monthly = df_monthly.set_index('Date')
     
-            # Ambil lag terbaik, default ke 18 misalnya
             best_lag = st.session_state.get('best_lag', 18)
-    
-            # Buat fitur lag sesuai best lag
             df_monthly[f'lag_{best_lag}'] = df_monthly['Quantity'].shift(best_lag)
             df_pred = df_monthly.dropna().copy()
     
-            # Normalisasi Quantity dan lag dengan MinMaxScaler
             scaler = MinMaxScaler()
             df_pred['Quantity_Scaled'] = scaler.fit_transform(df_pred[['Quantity']])
             df_pred[f'lag_{best_lag}_Scaled'] = scaler.transform(df_pred[[f'lag_{best_lag}']])
     
-            # Siapkan X dan y (scaled)
             X = df_pred[[f'lag_{best_lag}_Scaled']]
             y = df_pred['Quantity_Scaled']
     
-            # Split data (train-test)
             X_train, X_test, y_train, y_test = train_test_split(X, y, shuffle=False, test_size=0.2)
     
-            # Grid search dengan parameter
             param_grid = {
                 'learning_rate': [0.01, 0.1],
                 'max_depth': [1, 3, 5],
@@ -323,12 +311,10 @@ def main():
             grid_search.fit(X_train, y_train)
             best_model = grid_search.best_estimator_
     
-            # Fit ulang model ke semua data
             best_model.fit(X, y)
     
-            # Recursive forecasting 12 bulan ke depan
             future_preds_scaled = []
-            last_known_scaled = list(df_pred['Quantity_Scaled'].values[-best_lag:])  # ambil lag terakhir
+            last_known_scaled = list(df_pred['Quantity_Scaled'].values[-best_lag:])
     
             for _ in range(12):
                 input_lag_scaled = np.array([[last_known_scaled[-best_lag]]])
@@ -336,10 +322,8 @@ def main():
                 future_preds_scaled.append(pred_scaled)
                 last_known_scaled.append(pred_scaled)
     
-            # Inverse transform hasil prediksi ke skala asli
             future_preds = scaler.inverse_transform(np.array(future_preds_scaled).reshape(-1, 1)).flatten()
     
-            # Buat dataframe prediksi masa depan
             last_date = df_monthly.index[-1]
             future_dates = pd.date_range(start=last_date + pd.offsets.MonthBegin(1), periods=12, freq='MS')
             df_future = pd.DataFrame({
@@ -349,14 +333,12 @@ def main():
                 'Date': future_dates
             })
     
-            # Gabungkan data historis dan prediksi untuk plotting
             df_monthly_reset = df_monthly.reset_index()
             df_plot = pd.concat([
                 df_monthly_reset[['Year', 'Month', 'Quantity', 'Date']],
                 df_future
             ], ignore_index=True)
     
-            # Visualisasi
             st.subheader("📈 Prediksi Penjualan 12 Bulan ke Depan")
             fig, ax = plt.subplots(figsize=(12, 6))
             ax.plot(df_plot['Date'][:len(df_monthly)], df_plot['Quantity'][:len(df_monthly)],
@@ -371,7 +353,6 @@ def main():
             ax.grid(True)
             st.pyplot(fig)
     
-            # Tampilkan tabel prediksi
             st.write("### 📋 Tabel Hasil Prediksi")
             st.dataframe(df_future.reset_index(drop=True))
     
@@ -379,10 +360,6 @@ def main():
             st.warning("⚠️ Silakan lakukan preprocessing data terlebih dahulu!")
 
 
-
-
-
-  
 
 # Menjalankan aplikasi
 if __name__ == "__main__":
