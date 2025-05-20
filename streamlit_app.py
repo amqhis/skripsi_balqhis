@@ -152,54 +152,94 @@ def main():
 
 
     elif selected == '⚙️ Preprocessing Data':
-        st.title("⚙️ Preprocessing Data")
-        
-        if 'original_data' in st.session_state:
-            df = st.session_state['original_data'].copy()
-            
-            st.write("### 📌 Data Sebelum Preprocessing")
-            st.dataframe(df)
-    
-            # **1️⃣ Validasi Kolom yang Diperlukan**
-            required_columns = ['Tanggal Pembelian', 'Quantity']
-            missing_cols = [col for col in required_columns if col not in df.columns]
-            if missing_cols:
-                st.error(f"⚠️ Kolom berikut tidak ditemukan dalam data: {', '.join(missing_cols)}")
-            else:
-                # **2️⃣ Konversi 'Tanggal' ke Datetime**
-                df['Tanggal Pembelian'] = pd.to_datetime(df['Tanggal Pembelian'], errors='coerce')
-                df.dropna(subset=['Tanggal Pembelian'], inplace=True)
-    
-                # **3️⃣ Ekstrak Tahun & Bulan**
-                df['Year'] = df['Tanggal Pembelian'].dt.year
-                df['Month'] = df['Tanggal Pembelian'].dt.month
-    
-                # **4️⃣ Menghapus Nilai Kosong**
-                df.dropna(inplace=True)
-    
-                # **5️⃣ Normalisasi dengan MinMaxScaler**
-                scaler = MinMaxScaler()
-                numeric_cols = ['Quantity']  # Pastikan hanya 'Quantity' yang dinormalisasi
-                df[numeric_cols] = scaler.fit_transform(df[numeric_cols])
-    
-                st.write("### ✅ Data Setelah Preprocessing")
-                st.dataframe(df)
-    
-                # **6️⃣ Simpan Hasil Preprocessing ke Session State**
-                st.session_state['processed_data'] = df
-    
-                # **7️⃣ Visualisasi Data Setelah Normalisasi**
-                st.write("### 📊 Visualisasi Distribusi Data Setelah Normalisasi")
-                fig, ax = plt.subplots(figsize=(10, 5))
-                ax.plot(df['Tanggal Pembelian'], df['Quantity'], label="Quantity Normalized", color="blue")
-                ax.set_title("Distribusi Data Setelah Normalisasi")
-                ax.set_xlabel("Tanggal Pembelian")
-                ax.set_ylabel("Quantity (Scaled)")
-                ax.legend()
-                st.pyplot(fig)
-    
+    st.title("⚙️ Preprocessing Data")
+
+    if 'original_data' in st.session_state:
+        df = st.session_state['original_data'].copy()
+
+        st.write("### 📌 Data Sebelum Preprocessing")
+        st.dataframe(df)
+
+        # 1️⃣ Validasi Kolom
+        required_columns = ['Tanggal Pembelian', 'Quantity']
+        missing_cols = [col for col in required_columns if col not in df.columns]
+        if missing_cols:
+            st.error(f"⚠️ Kolom berikut tidak ditemukan dalam data: {', '.join(missing_cols)}")
         else:
-            st.warning("⚠️ Harap unggah data terlebih dahulu di bagian '📂 Upload Data'.")
+            # 2️⃣ Konversi 'Tanggal Pembelian'
+            df['Tanggal Pembelian'] = pd.to_datetime(df['Tanggal Pembelian'], errors='coerce')
+            df.dropna(subset=['Tanggal Pembelian'], inplace=True)
+
+            # 3️⃣ Statistik Deskriptif per Tahun
+            df['Tahun'] = df['Tanggal Pembelian'].dt.year
+            deskripsi_per_tahun = df.groupby('Tahun')['Quantity'].describe()
+            st.write("### 📊 Statistik Deskriptif per Tahun")
+            st.dataframe(deskripsi_per_tahun)
+
+            # 4️⃣ Cek Missing Value
+            missing_values = df.isnull().sum().sum()
+            if missing_values > 0:
+                st.warning(f"⚠️ Missing value ditemukan sebanyak {missing_values}! Membersihkan data...")
+                df.dropna(subset=['Tanggal Pembelian', 'Quantity'], inplace=True)
+                df = df[df['Quantity'] > 0]
+            else:
+                st.success("✅ Tidak ada missing value dalam dataset.")
+
+            # 5️⃣ Agregasi Bulanan
+            df['Year'] = df['Tanggal Pembelian'].dt.year
+            df['Month'] = df['Tanggal Pembelian'].dt.month
+            df_monthly = df.groupby(['Year', 'Month'])[['Quantity']].sum().reset_index()
+
+            # 6️⃣ Visualisasi ACF & PACF
+            st.write("### 🔁 Visualisasi ACF dan PACF")
+            lags = 20
+            acf_vals = acf(df_monthly['Quantity'], nlags=lags)
+            pacf_vals = pacf(df_monthly['Quantity'], nlags=lags)
+            threshold = 1.96 / np.sqrt(len(df_monthly))
+
+            fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+
+            axes[0].stem(range(len(acf_vals)), acf_vals, markerfmt='.', basefmt=" ", linefmt='green')
+            axes[0].axhline(y=threshold, linestyle='-', color='red')
+            axes[0].axhline(y=-threshold, linestyle='-', color='red')
+            axes[0].axhline(y=0, linestyle='--', color='black')
+            axes[0].set_title("Autocorrelation Function (ACF)")
+
+            axes[1].stem(range(len(pacf_vals)), pacf_vals, markerfmt='.', basefmt=" ", linefmt='blue')
+            axes[1].axhline(y=threshold, linestyle='-', color='red')
+            axes[1].axhline(y=-threshold, linestyle='-', color='red')
+            axes[1].axhline(y=0, linestyle='--', color='black')
+            axes[1].set_title("Partial Autocorrelation Function (PACF)")
+
+            st.pyplot(fig)
+            st.info("📌 Dari visualisasi ACF dan PACF, lag terbaik yang disarankan adalah **lag 18**.")
+
+            # 7️⃣ Tampilkan Isi Lag 18
+            df_monthly['lag_18'] = df_monthly['Quantity'].shift(18)
+            df_lag18 = df_monthly.dropna(subset=['lag_18'])
+            st.write("### 🧾 Data dengan Lag 18")
+            st.dataframe(df_lag18[['Year', 'Month', 'lag_18', 'Quantity']])
+
+            # 8️⃣ Normalisasi
+            scaler = MinMaxScaler()
+            df_monthly['Quantity_Scaled'] = scaler.fit_transform(df_monthly[['Quantity']])
+            st.write("### ✅ Data Setelah Normalisasi")
+            st.dataframe(df_monthly[['Year', 'Month', 'Quantity', 'Quantity_Scaled']])
+
+            # 9️⃣ Simpan ke Session State
+            st.session_state['processed_data'] = df_monthly
+
+            # 🔟 Visualisasi Normalisasi
+            st.write("### 📊 Visualisasi Quantity Setelah Normalisasi")
+            fig, ax = plt.subplots(figsize=(10, 5))
+            ax.plot(df_monthly.index, df_monthly['Quantity_Scaled'], color='purple')
+            ax.set_title("Distribusi Quantity Setelah Normalisasi")
+            ax.set_xlabel("Index Waktu")
+            ax.set_ylabel("Quantity (Scaled)")
+            st.pyplot(fig)
+
+    else:
+        st.warning("⚠️ Harap unggah data terlebih dahulu di bagian '📂 Upload Data'.")
 
     
     elif selected == '📊 Visualisasi Data Historis':
