@@ -273,95 +273,82 @@ def main():
         st.title("🔮 Prediksi Masa Depan")
     
         if 'processed_data' in st.session_state and not st.session_state['processed_data'].empty:
-            df = st.session_state['processed_data']
+            df = st.session_state['processed_data'].copy()
     
-            if df.empty:
-                st.warning("⚠️ Data historis kosong. Pastikan Anda telah melakukan preprocessing.")
-            else:
-                # Agregasi data bulanan
-                df_monthly = df.groupby(['Year', 'Month'])['Quantity'].sum().reset_index()
+            # Pastikan data sudah ada lag_18
+            if 'lag_18' not in df.columns:
+                df['lag_18'] = df['Quantity'].shift(18)
+                df.dropna(subset=['lag_18'], inplace=True)
     
-                if df_monthly.empty:
-                    st.warning("⚠️ Data setelah preprocessing kosong. Coba ulangi preprocessing.")
-                else:
-                    # Buat kolom tanggal
-                    df_monthly['Date'] = pd.to_datetime(df_monthly[['Year', 'Month']].assign(DAY=1))
-                    df_monthly = df_monthly.set_index('Date')
+            # Data latih: pakai Year, Month, dan lag_18
+            X = df[['Year', 'Month', 'lag_18']]
+            y = df['Quantity_Scaled']
     
-                    # Hitung lag terbaik dari session_state
-                    best_lag = st.session_state.get('best_lag', 1)
+            # Split data train/test (shuffle=False biar tetap urut waktu)
+            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=False)
     
-                    # Siapkan data dengan lag
-                    df_pred = df_monthly.copy()
-                    df_pred[f'lag_{best_lag}'] = df_pred['Quantity'].shift(best_lag)
-                    df_pred = df_pred.dropna()
+            # Training Model
+            model = xgb.XGBRegressor(objective='reg:squarederror', n_estimators=100, learning_rate=0.1)
+            model.fit(X_train, y_train)
     
-                    X = df_pred[[f'lag_{best_lag}']]
-                    y = df_pred['Quantity']
-                    X_train, X_test, y_train, y_test = train_test_split(X, y, shuffle=False, test_size=0.2)
+            # Prediksi Masa Depan dengan metode recursive forecasting
     
-                    # Grid search parameter
-                    param_grid = {
-                        'learning_rate': [0.01],
-                        'max_depth': [1],
-                        'min_child_weight': [13]
-                    }
-                    grid_search = GridSearchCV(
-                        estimator=XGBRegressor(objective='reg:squarederror'),
-                        param_grid=param_grid,
-                        scoring='r2',
-                        cv=3,
-                        n_jobs=-1
-                    )
-                    grid_search.fit(X_train, y_train)
-                    best_model = grid_search.best_estimator_
+            # Kita mulai dari 18 data terakhir sebagai lag awal
+            last_18 = df['Quantity_Scaled'].tail(18).values.tolist()
     
-                    # Fit ulang model ke semua data
-                    best_model.fit(X, y)
+            future_years = list(np.repeat(range(2024, 2026), 12))
+            future_months = list(range(1, 13)) * 2
     
-                    # Recursive forecasting
-                    future_preds = []
-                    last_known = df_monthly['Quantity'].tolist()
-                    for _ in range(12):
-                        input_lag = last_known[-best_lag]
-                        pred = best_model.predict(np.array([[input_lag]]))[0]
-                        future_preds.append(pred)
-                        last_known.append(pred)
+            future_pred_scaled = []
     
-                    # Buat dataframe hasil prediksi
-                    future_dates = pd.date_range(start='2024-01-01', periods=12, freq='MS')
-                    df_future = pd.DataFrame({
-                        'Year': future_dates.year,
-                        'Month': future_dates.month,
-                        'Quantity': future_preds,
-                        'Date': future_dates
-                    })
+            for i in range(len(future_years)):
+                year = future_years[i]
+                month = future_months[i]
     
-                    # Gabung historis dan prediksi
-                    df_monthly_reset = df_monthly.reset_index()
-                    df_plot = pd.concat([
-                        df_monthly_reset[['Year', 'Month', 'Quantity', 'Date']],
-                        df_future
-                    ], ignore_index=True)
+                # Ambil lag_18 dari hasil prediksi sebelumnya
+                lag_18_value = last_18[-18]  # lag ke-18
     
-                    # Visualisasi
-                    st.subheader("📈 Prediksi Penjualan 2024")
-                    fig, ax = plt.subplots(figsize=(12, 6))
-                    ax.plot(df_plot['Date'][:len(df_monthly)], df_plot['Quantity'][:len(df_monthly)], label="Data Historis", color='blue', marker='o')
-                    ax.plot(df_plot['Date'][len(df_monthly):], df_plot['Quantity'][len(df_monthly):], label="Prediksi 2024", color='orange', marker='s')
-                    ax.axvline(x=df_monthly_reset['Date'].iloc[-1], color='red', linestyle='--', label='Awal Prediksi')
-                    ax.set_xlabel("Bulan")
-                    ax.set_ylabel("Kuantitas")
-                    ax.set_title("Prediksi Kuantitas Januari - Desember 2024")
-                    ax.legend()
-                    ax.grid(True)
-                    st.pyplot(fig)
+                # Buat fitur input
+                X_pred = pd.DataFrame({'Year': [year], 'Month': [month], 'lag_18': [lag_18_value]})
     
-                    # Tampilkan tabel prediksi
-                    st.write("### 📋 Tabel Hasil Prediksi")
-                    st.dataframe(df_future)
+                # Prediksi
+                pred_scaled = model.predict(X_pred)[0]
+                future_pred_scaled.append(pred_scaled)
+    
+                # Update last_18 dengan prediksi baru supaya bisa dipakai lag berikutnya
+                last_18.append(pred_scaled)
+    
+            # Inverse transform ke nilai asli
+            scaler = MinMaxScaler()
+            scaler.fit(df[['Quantity']])  # fitting ulang scaler agar sama dengan preprocessing
+            future_pred_actual = scaler.inverse_transform(np.array(future_pred_scaled).reshape(-1, 1)).flatten()
+    
+            future_results = pd.DataFrame({
+                'Year': future_years,
+                'Month': future_months,
+                'Predicted_Quantity': future_pred_actual,
+                'Date': pd.to_datetime(pd.DataFrame({'Year': future_years, 'Month': future_months}).assign(day=1))
+            })
+    
+            # Visualisasi
+            st.subheader("📈 Prediksi Penjualan 2024-2025")
+            fig, ax = plt.subplots(figsize=(12, 6))
+            ax.plot(df['Date'], df['Quantity'], label="Data Historis", marker='o', color='blue')
+            ax.plot(future_results['Date'], future_results['Predicted_Quantity'], label="Prediksi 2024-2025", marker='s', color='red')
+            ax.set_xlabel("Bulan")
+            ax.set_ylabel("Total Quantity")
+            ax.set_title("Prediksi Kuantitas Januari 2024 - Desember 2025")
+            ax.legend()
+            ax.grid()
+            st.pyplot(fig)
+    
+            # Tampilkan tabel hasil prediksi
+            st.write("### 📋 Tabel Hasil Prediksi")
+            st.dataframe(future_results)
+    
         else:
             st.warning("⚠️ Silakan lakukan preprocessing data terlebih dahulu!")
+
 
 
   
