@@ -230,15 +230,6 @@ def main():
                 # 9️⃣ Simpan ke Session State
                 st.session_state['processed_data'] = df_monthly
     
-                # 🔟 Visualisasi Normalisasi
-                st.write("### 📊 Visualisasi Quantity Setelah Normalisasi")
-                fig, ax = plt.subplots(figsize=(10, 5))
-                ax.plot(df_monthly.index, df_monthly['Quantity_Scaled'], color='purple')
-                ax.set_title("Distribusi Quantity Setelah Normalisasi")
-                ax.set_xlabel("Index Waktu")
-                ax.set_ylabel("Quantity (Scaled)")
-                st.pyplot(fig)
-    
         else:
             st.warning("⚠️ Harap unggah data terlebih dahulu di bagian '📂 Upload Data'.")
 
