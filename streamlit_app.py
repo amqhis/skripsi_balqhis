@@ -2,17 +2,18 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import MinMaxScaler
-import xgboost as xgb
-from streamlit_option_menu import option_menu
-from statsmodels.tsa.stattools import acf, pacf
 import matplotlib.dates as mdates
-from xgboost import XGBRegressor
+
 from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.preprocessing import MinMaxScaler
+
+import xgboost as xgb
+from xgboost import XGBRegressor
+
 from statsmodels.tsa.stattools import acf, pacf
 from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
-import matplotlib.pyplot as plt
+
+from streamlit_option_menu import option_menu
 
 
 
@@ -212,8 +213,7 @@ def main():
         else:
             st.warning("⚠️ Harap unggah data terlebih dahulu di bagian '📂 Upload Data'.")
 
-
-    
+   
     elif selected == '📊 Visualisasi Data Historis':
         st.title("Visualisasi Data Historis")
         if 'original_data' in st.session_state:
