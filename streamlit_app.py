@@ -10,6 +10,8 @@ from statsmodels.tsa.stattools import acf, pacf
 import matplotlib.dates as mdates
 from xgboost import XGBRegressor
 from sklearn.model_selection import train_test_split, GridSearchCV
+from statsmodels.tsa.stattools import acf, pacf
+
 
 
 # Konfigurasi halaman Streamlit
@@ -170,7 +172,7 @@ def main():
             if missing_cols:
                 st.error(f"⚠️ Kolom berikut tidak ditemukan dalam data: {', '.join(missing_cols)}")
             else:
-                # 2️⃣ Konversi 'Tanggal Pembelian'
+                # 2️⃣ Konversi 'Tanggal Pembelian' ke datetime dan drop NaT
                 df['Tanggal Pembelian'] = pd.to_datetime(df['Tanggal Pembelian'], errors='coerce')
                 df.dropna(subset=['Tanggal Pembelian'], inplace=True)
     
@@ -180,7 +182,7 @@ def main():
                 st.write("### 📊 Statistik Deskriptif per Tahun")
                 st.dataframe(deskripsi_per_tahun)
     
-                # 4️⃣ Cek Missing Value
+                # 4️⃣ Cek Missing Value dan bersihkan jika ada
                 missing_values = df.isnull().sum().sum()
                 if missing_values > 0:
                     st.warning(f"⚠️ Missing value ditemukan sebanyak {missing_values}! Membersihkan data...")
@@ -196,41 +198,53 @@ def main():
                 st.write("### 📅 Data Agregasi Bulanan")
                 st.dataframe(df_monthly)
     
-                # 6️⃣ Visualisasi ACF & PACF menggunakan Quantity asli
-                st.write("### 🔁 Visualisasi ACF dan PACF (Quantity Asli)")
-                lags = 20
-                acf_vals = acf(df_monthly['Quantity'], nlags=lags)
-                pacf_vals = pacf(df_monthly['Quantity'], nlags=lags)
-                threshold = 1.96 / np.sqrt(len(df_monthly))
+                # Pastikan Quantity numeric dan tidak ada NaN
+                df_monthly['Quantity'] = pd.to_numeric(df_monthly['Quantity'], errors='coerce')
+                df_monthly = df_monthly.dropna(subset=['Quantity'])
     
-                fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+                # Cek apakah data cukup untuk ACF/PACF (minimal 19 baris)
+                if len(df_monthly) < 19:
+                    st.warning("⚠️ Data bulanan kurang dari 19 baris, tidak dapat membuat plot ACF dan PACF untuk lag 17 dan 18.")
+                else:
+                    # 6️⃣ Visualisasi ACF & PACF
+                    st.write("### 🔁 Visualisasi ACF dan PACF (Quantity Asli)")
+                    lags = 20
+                    try:
+                        acf_vals = acf(df_monthly['Quantity'], nlags=lags)
+                        pacf_vals = pacf(df_monthly['Quantity'], nlags=lags)
+                        threshold = 1.96 / np.sqrt(len(df_monthly))
     
-                axes[0].stem(range(len(acf_vals)), acf_vals, markerfmt='.', basefmt=" ", linefmt='green')
-                axes[0].axhline(y=threshold, linestyle='-', color='red')
-                axes[0].axhline(y=-threshold, linestyle='-', color='red')
-                axes[0].axhline(y=0, linestyle='--', color='black')
-                axes[0].set_title("Autocorrelation Function (ACF)")
-                axes[0].annotate("Lag 17", (17, acf_vals[17]), textcoords="offset points", xytext=(0,10), ha='center', color='blue')
-                axes[0].annotate("Lag 18", (18, acf_vals[18]), textcoords="offset points", xytext=(0,10), ha='center', color='blue')
+                        fig, axes = plt.subplots(1, 2, figsize=(14, 5))
     
-                axes[1].stem(range(len(pacf_vals)), pacf_vals, markerfmt='.', basefmt=" ", linefmt='blue')
-                axes[1].axhline(y=threshold, linestyle='-', color='red')
-                axes[1].axhline(y=-threshold, linestyle='-', color='red')
-                axes[1].axhline(y=0, linestyle='--', color='black')
-                axes[1].set_title("Partial Autocorrelation Function (PACF)")
-                axes[1].annotate("Lag 17", (17, pacf_vals[17]), textcoords="offset points", xytext=(0,10), ha='center', color='green')
-                axes[1].annotate("Lag 18", (18, pacf_vals[18]), textcoords="offset points", xytext=(0,10), ha='center', color='green')
+                        axes[0].stem(range(len(acf_vals)), acf_vals, markerfmt='.', basefmt=" ", linefmt='green')
+                        axes[0].axhline(y=threshold, linestyle='-', color='red')
+                        axes[0].axhline(y=-threshold, linestyle='-', color='red')
+                        axes[0].axhline(y=0, linestyle='--', color='black')
+                        axes[0].set_title("Autocorrelation Function (ACF)")
+                        axes[0].annotate("Lag 17", (17, acf_vals[17]), textcoords="offset points", xytext=(0,10), ha='center', color='blue')
+                        axes[0].annotate("Lag 18", (18, acf_vals[18]), textcoords="offset points", xytext=(0,10), ha='center', color='blue')
     
-                st.pyplot(fig)
-                st.info("📌 Berdasarkan grafik ACF dan PACF, lag yang melewati batas signifikan adalah **lag 17 dan 18**, dan lag terbaik yang dipilih adalah **lag 18**.")
+                        axes[1].stem(range(len(pacf_vals)), pacf_vals, markerfmt='.', basefmt=" ", linefmt='blue')
+                        axes[1].axhline(y=threshold, linestyle='-', color='red')
+                        axes[1].axhline(y=-threshold, linestyle='-', color='red')
+                        axes[1].axhline(y=0, linestyle='--', color='black')
+                        axes[1].set_title("Partial Autocorrelation Function (PACF)")
+                        axes[1].annotate("Lag 17", (17, pacf_vals[17]), textcoords="offset points", xytext=(0,10), ha='center', color='green')
+                        axes[1].annotate("Lag 18", (18, pacf_vals[18]), textcoords="offset points", xytext=(0,10), ha='center', color='green')
     
-                # 7️⃣ Tampilkan Isi Lag 18
+                        st.pyplot(fig)
+    
+                        st.info("📌 Berdasarkan grafik ACF dan PACF, lag yang melewati batas signifikan adalah **lag 17 dan 18**, dan lag terbaik yang dipilih adalah **lag 18**.")
+                    except Exception as e:
+                        st.error(f"Error saat visualisasi ACF/PACF: {e}")
+    
+                # 7️⃣ Tampilkan Data dengan Lag 18
                 df_monthly['lag_18'] = df_monthly['Quantity'].shift(18)
                 df_lag18 = df_monthly.dropna(subset=['lag_18'])
                 st.write("### 🧾 Data dengan Lag 18")
                 st.dataframe(df_lag18[['Year', 'Month', 'lag_18', 'Quantity']])
     
-                # 8️⃣ Simpan ke Session State
+                # 8️⃣ Simpan hasil preprocessing ke session state
                 st.session_state['processed_data'] = df_monthly
     
         else:
