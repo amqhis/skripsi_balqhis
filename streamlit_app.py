@@ -210,6 +210,20 @@ def main():
                 # 7️⃣ Simpan ke Session State
                 st.session_state['processed_data'] = df_monthly
     
+                # 8️⃣ Visualisasi ACF dan PACF
+                from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
+                import matplotlib.pyplot as plt
+    
+                st.write("### 🔄 Autocorrelation Function (ACF)")
+                fig_acf, ax_acf = plt.subplots(figsize=(10, 4))
+                plot_acf(df_monthly['Quantity'], lags=30, ax=ax_acf)
+                st.pyplot(fig_acf)
+    
+                st.write("### 🧮 Partial Autocorrelation Function (PACF)")
+                fig_pacf, ax_pacf = plt.subplots(figsize=(10, 4))
+                plot_pacf(df_monthly['Quantity'], lags=30, ax=ax_pacf, method='ywm')
+                st.pyplot(fig_pacf)
+    
         else:
             st.warning("⚠️ Harap unggah data terlebih dahulu di bagian '📂 Upload Data'.")
 
