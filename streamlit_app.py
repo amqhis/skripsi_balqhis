@@ -285,7 +285,6 @@ def main():
 
 
     elif selected == '🔮 Prediksi Masa Depan':
-           elif selected == '🔮 Prediksi Masa Depan':
         st.title("🔮 Prediksi Masa Depan")
     
         uploaded_file = st.file_uploader("Upload file CSV data penjualan bulanan", type=["csv"])
