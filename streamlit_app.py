@@ -11,6 +11,8 @@ import matplotlib.dates as mdates
 from xgboost import XGBRegressor
 from sklearn.model_selection import train_test_split, GridSearchCV
 from statsmodels.tsa.stattools import acf, pacf
+from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
+import matplotlib.pyplot as plt
 
 
 
@@ -283,105 +285,7 @@ def main():
 
 
     elif selected == '🔮 Prediksi Masa Depan':
-        st.title("🔮 Prediksi Masa Depan")
-    
-        uploaded_file = st.file_uploader("Upload file CSV data penjualan bulanan", type=["csv"])
-    
-        if uploaded_file is not None:
-            df_monthly = pd.read_csv(uploaded_file)
-    
-            if {'Year', 'Month', 'Quantity'}.issubset(df_monthly.columns):
-                best_lag = 18
-    
-                # Buat kolom datetime dan set sebagai index
-                df_monthly['Date'] = pd.to_datetime(df_monthly[['Year', 'Month']].assign(DAY=1))
-                df_monthly = df_monthly.set_index('Date')
-    
-                # Tambahkan fitur lag
-                df_pred = df_monthly.copy()
-                df_pred[f'lag_{best_lag}'] = df_pred['Quantity'].shift(best_lag)
-    
-                # Siapkan data training (drop baris dengan NaN)
-                X_train = df_pred[[f'lag_{best_lag}']].dropna()
-                y_train = df_pred['Quantity'].loc[X_train.index]
-    
-                # Grid search dengan parameter yang sudah diketahui terbaik
-                param_grid = {
-                    'learning_rate': [0.01],
-                    'max_depth': [1],
-                    'min_child_weight': [13]
-                }
-    
-                from xgboost import XGBRegressor
-                from sklearn.model_selection import GridSearchCV
-    
-                grid_search = GridSearchCV(
-                    estimator=XGBRegressor(objective='reg:squarederror'),
-                    param_grid=param_grid,
-                    scoring='r2',
-                    cv=3,
-                    n_jobs=-1
-                )
-                grid_search.fit(X_train, y_train)
-                best_model = grid_search.best_estimator_
-    
-                # Latih ulang model dengan seluruh data training
-                best_model.fit(X_train, y_train)
-    
-                # Prediksi 4 bulan ke depan secara recursive
-                future_preds = []
-                last_known = df_monthly['Quantity'].tolist()
-    
-                for _ in range(4):
-                    input_lag = last_known[-best_lag]
-                    pred = best_model.predict(np.array([[input_lag]]))[0]
-                    future_preds.append(pred)
-                    last_known.append(pred)
-    
-                # Buat DataFrame hasil prediksi
-                future_dates = pd.date_range(start=df_monthly.index[-1] + pd.DateOffset(months=1), periods=4, freq='MS')
-                df_future = pd.DataFrame({
-                    'Year': future_dates.year,
-                    'Month': future_dates.month,
-                    'Quantity': future_preds,
-                    'Date': future_dates
-                })
-    
-                st.subheader("Prediksi Kuantitas 4 Bulan ke Depan:")
-                st.dataframe(df_future[['Year', 'Month', 'Quantity']])
-    
-                # Gabungkan data historis dan prediksi untuk plotting
-                df_monthly_reset = df_monthly.reset_index()
-                df_plot = pd.concat([df_monthly_reset[['Date', 'Quantity']], df_future[['Date', 'Quantity']]], ignore_index=True)
-    
-                # Plot visualisasi
-                import matplotlib.pyplot as plt
-                import matplotlib.dates as mdates
-    
-                fig, ax = plt.subplots(figsize=(12, 5))
-                ax.plot(df_plot['Date'][:len(df_monthly)], df_plot['Quantity'][:len(df_monthly)], label='Data Historis', color='blue')
-                ax.plot(df_plot['Date'][len(df_monthly):], df_plot['Quantity'][len(df_monthly):], label='Prediksi 4 Bulan', color='orange')
-                ax.axvline(x=df_monthly.index[-1], color='red', linestyle='--', label='Mulai Prediksi')
-    
-                ax.set_title("Prediksi Kuantitas 4 Bulan ke Depan (Lag 18)")
-                ax.set_xlabel("Tanggal (Bulan-Tahun)")
-                ax.set_ylabel("Kuantitas")
-                ax.legend()
-                ax.grid(False)
-    
-                ax.xaxis.set_major_locator(mdates.MonthLocator(interval=1))
-                ax.xaxis.set_major_formatter(mdates.DateFormatter('%m-%Y'))
-                plt.xticks(rotation=45)
-                plt.tight_layout()
-    
-                st.pyplot(fig)
-    
-            else:
-                st.error("File harus memiliki kolom: Year, Month, dan Quantity")
-        else:
-            st.info("Silakan upload file CSV data penjualan bulanan terlebih dahulu")
-    
-
+       
 
 # Menjalankan aplikasi
 if __name__ == "__main__":
