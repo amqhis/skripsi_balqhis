@@ -210,26 +210,43 @@ def main():
                 # 7️⃣ Simpan ke Session State
                 st.session_state['processed_data'] = df_monthly
     
-                # 8️⃣ Visualisasi ACF dan PACF
-                st.write("### 🔄 Autocorrelation Function (ACF) & Partial ACF (PACF)")
+                # 8️⃣ Visualisasi ACF dan PACF Manual (Seperti Google Colab)
+                st.write("### 🔄 Visualisasi ACF dan PACF (Manual Style)")
                 
-                from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
+                from statsmodels.tsa.stattools import acf, pacf
+                import numpy as np
                 import matplotlib.pyplot as plt
                 
-                try:
-                    if len(df_monthly['Quantity']) <= 20:
-                        st.warning("📉 Jumlah data kurang dari 21 baris, tidak bisa menampilkan ACF/PACF dengan lag 20.")
-                    else:
-                        fig_acf, ax_acf = plt.subplots(figsize=(10, 4))
-                        plot_acf(df_monthly['Quantity'], lags=20, ax=ax_acf)
-                        st.pyplot(fig_acf)
+                lags = 20
+                acf_vals = acf(df_monthly['Quantity'], nlags=lags)
+                pacf_vals = pacf(df_monthly['Quantity'], nlags=lags)
+                threshold = 1.96 / np.sqrt(len(df_monthly))
                 
-                        fig_pacf, ax_pacf = plt.subplots(figsize=(10, 4))
-                        plot_pacf(df_monthly['Quantity'], lags=20, method='ywm', ax=ax_pacf)
-                        st.pyplot(fig_pacf)
+                # Buat plot menggunakan matplotlib
+                fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
                 
-                except Exception as e:
-                    st.error(f"❌ Gagal menampilkan ACF/PACF: {str(e)}")
+                # Plot ACF
+                ax1.stem(range(len(acf_vals)), acf_vals, markerfmt='.', basefmt=" ", linefmt='green')
+                ax1.axhline(y=threshold, linestyle='-', color='red')
+                ax1.axhline(y=-threshold, linestyle='-', color='red')
+                ax1.axhline(y=0, linestyle='-', color='black', linewidth=0.5)
+                ax1.set_title("Autocorrelation Function (ACF)")
+                ax1.set_xlabel("Lag")
+                ax1.set_ylabel("ACF")
+                ax1.grid(True)
+                
+                # Plot PACF
+                ax2.stem(range(len(pacf_vals)), pacf_vals, markerfmt='.', basefmt=" ", linefmt='blue')
+                ax2.axhline(y=threshold, linestyle='-', color='red')
+                ax2.axhline(y=-threshold, linestyle='-', color='red')
+                ax2.axhline(y=0, linestyle='-', color='black', linewidth=0.5)
+                ax2.set_title("Partial Autocorrelation Function (PACF)")
+                ax2.set_xlabel("Lag")
+                ax2.set_ylabel("PACF")
+                ax2.grid(True)
+                
+                plt.tight_layout()
+                st.pyplot(fig)
 
 
     
