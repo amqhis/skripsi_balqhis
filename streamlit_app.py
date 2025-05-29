@@ -156,86 +156,85 @@ def main():
 
 
     elif selected == '⚙️ Preprocessing Data':
-        st.title("⚙️ Preprocessing Data")
-    
-        if 'original_data' in st.session_state:
-            df = st.session_state['original_data'].copy()
-    
-            st.write("### 📌 Data Sebelum Preprocessing")
-            st.dataframe(df)
-    
-            # 1️⃣ Validasi Kolom
-            required_columns = ['Tanggal Pembelian', 'Quantity']
-            missing_cols = [col for col in required_columns if col not in df.columns]
-            if missing_cols:
-                st.error(f"⚠️ Kolom berikut tidak ditemukan dalam data: {', '.join(missing_cols)}")
-            else:
-                # 2️⃣ Konversi 'Tanggal Pembelian'
-                df['Tanggal Pembelian'] = pd.to_datetime(df['Tanggal Pembelian'], errors='coerce')
-                df.dropna(subset=['Tanggal Pembelian'], inplace=True)
-    
-                # 3️⃣ Statistik Deskriptif per Tahun
-                df['Tahun'] = df['Tanggal Pembelian'].dt.year
-                deskripsi_per_tahun = df.groupby('Tahun')['Quantity'].describe()
-                st.write("### 📊 Statistik Deskriptif per Tahun")
-                st.dataframe(deskripsi_per_tahun)
-    
-                # 4️⃣ Cek Missing Value
-                missing_values = df.isnull().sum().sum()
-                if missing_values > 0:
-                    st.warning(f"⚠️ Missing value ditemukan sebanyak {missing_values}! Membersihkan data...")
-                    df.dropna(subset=['Tanggal Pembelian', 'Quantity'], inplace=True)
-                    df = df[df['Quantity'] > 0]
-                else:
-                    st.success("✅ Tidak ada missing value dalam dataset.")
-    
-                # 5️⃣ Agregasi Bulanan
-                df['Year'] = df['Tanggal Pembelian'].dt.year
-                df['Month'] = df['Tanggal Pembelian'].dt.month
-                df_monthly = df.groupby(['Year', 'Month'])[['Quantity']].sum().reset_index()
-    
-                # 6️⃣ Visualisasi ACF & PACF menggunakan Quantity asli
-                st.write("### 🔁 Visualisasi ACF dan PACF (Quantity Asli)")
-                lags = 20
-                acf_vals = acf(df_monthly['Quantity'], nlags=lags)
-                pacf_vals = pacf(df_monthly['Quantity'], nlags=lags)
-                threshold = 1.96 / np.sqrt(len(df_monthly))
-    
-                fig, axes = plt.subplots(1, 2, figsize=(14, 5))
-    
-                axes[0].stem(range(len(acf_vals)), acf_vals, markerfmt='.', basefmt=" ", linefmt='green')
-                axes[0].axhline(y=threshold, linestyle='-', color='red')
-                axes[0].axhline(y=-threshold, linestyle='-', color='red')
-                axes[0].axhline(y=0, linestyle='--', color='black')
-                axes[0].set_title("Autocorrelation Function (ACF)")
-                axes[0].annotate("Lag 17", (17, acf_vals[17]), textcoords="offset points", xytext=(0,10), ha='center', color='blue')
-                axes[0].annotate("Lag 18", (18, acf_vals[18]), textcoords="offset points", xytext=(0,10), ha='center', color='blue')
-    
-                axes[1].stem(range(len(pacf_vals)), pacf_vals, markerfmt='.', basefmt=" ", linefmt='blue')
-                axes[1].axhline(y=threshold, linestyle='-', color='red')
-                axes[1].axhline(y=-threshold, linestyle='-', color='red')
-                axes[1].axhline(y=0, linestyle='--', color='black')
-                axes[1].set_title("Partial Autocorrelation Function (PACF)")
-                axes[1].annotate("Lag 17", (17, pacf_vals[17]), textcoords="offset points", xytext=(0,10), ha='center', color='green')
-                axes[1].annotate("Lag 18", (18, pacf_vals[18]), textcoords="offset points", xytext=(0,10), ha='center', color='green')
-    
-                st.pyplot(fig)
-                st.info("📌 Berdasarkan grafik ACF dan PACF, lag yang melewati batas signifikan adalah **lag 17 dan 18**, dan lag terbaik yang dipilih adalah **lag 18**.")
-    
-                # 7️⃣ Tampilkan Isi Lag 18
-                df_monthly['lag_18'] = df_monthly['Quantity'].shift(18)
-                df_lag18 = df_monthly.dropna(subset=['lag_18'])
-                st.write("### 🧾 Data dengan Lag 18")
-                st.dataframe(df_lag18[['Year', 'Month', 'lag_18', 'Quantity']])
-    
-                # 8️⃣ Simpan ke Session State
-                st.session_state['processed_data'] = df_monthly
-    
+    st.title("⚙️ Preprocessing Data")
+
+    if 'original_data' in st.session_state:
+        df = st.session_state['original_data'].copy()
+
+        st.write("### 📌 Data Sebelum Preprocessing")
+        st.dataframe(df)
+
+        # 1️⃣ Validasi Kolom
+        required_columns = ['Tanggal Pembelian', 'Quantity']
+        missing_cols = [col for col in required_columns if col not in df.columns]
+        if missing_cols:
+            st.error(f"⚠️ Kolom berikut tidak ditemukan dalam data: {', '.join(missing_cols)}")
         else:
-            st.warning("⚠️ Harap unggah data terlebih dahulu di bagian '📂 Upload Data'.")
+            # 2️⃣ Konversi 'Tanggal Pembelian'
+            df['Tanggal Pembelian'] = pd.to_datetime(df['Tanggal Pembelian'], errors='coerce')
+            df.dropna(subset=['Tanggal Pembelian'], inplace=True)
 
+            # 3️⃣ Statistik Deskriptif per Tahun
+            df['Tahun'] = df['Tanggal Pembelian'].dt.year
+            deskripsi_per_tahun = df.groupby('Tahun')['Quantity'].describe()
+            st.write("### 📊 Statistik Deskriptif per Tahun")
+            st.dataframe(deskripsi_per_tahun)
 
+            # 4️⃣ Cek Missing Value
+            missing_values = df.isnull().sum().sum()
+            if missing_values > 0:
+                st.warning(f"⚠️ Missing value ditemukan sebanyak {missing_values}! Membersihkan data...")
+                df.dropna(subset=['Tanggal Pembelian', 'Quantity'], inplace=True)
+                df = df[df['Quantity'] > 0]
+            else:
+                st.success("✅ Tidak ada missing value dalam dataset.")
 
+            # 5️⃣ Agregasi Bulanan
+            df['Year'] = df['Tanggal Pembelian'].dt.year
+            df['Month'] = df['Tanggal Pembelian'].dt.month
+            df_monthly = df.groupby(['Year', 'Month'])[['Quantity']].sum().reset_index()
+            st.write("### 📅 Data Agregasi Bulanan")
+            st.dataframe(df_monthly)
+
+            # 6️⃣ Visualisasi ACF & PACF menggunakan Quantity asli
+            st.write("### 🔁 Visualisasi ACF dan PACF (Quantity Asli)")
+            lags = 20
+            acf_vals = acf(df_monthly['Quantity'], nlags=lags)
+            pacf_vals = pacf(df_monthly['Quantity'], nlags=lags)
+            threshold = 1.96 / np.sqrt(len(df_monthly))
+
+            fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+
+            axes[0].stem(range(len(acf_vals)), acf_vals, markerfmt='.', basefmt=" ", linefmt='green')
+            axes[0].axhline(y=threshold, linestyle='-', color='red')
+            axes[0].axhline(y=-threshold, linestyle='-', color='red')
+            axes[0].axhline(y=0, linestyle='--', color='black')
+            axes[0].set_title("Autocorrelation Function (ACF)")
+            axes[0].annotate("Lag 17", (17, acf_vals[17]), textcoords="offset points", xytext=(0,10), ha='center', color='blue')
+            axes[0].annotate("Lag 18", (18, acf_vals[18]), textcoords="offset points", xytext=(0,10), ha='center', color='blue')
+
+            axes[1].stem(range(len(pacf_vals)), pacf_vals, markerfmt='.', basefmt=" ", linefmt='blue')
+            axes[1].axhline(y=threshold, linestyle='-', color='red')
+            axes[1].axhline(y=-threshold, linestyle='-', color='red')
+            axes[1].axhline(y=0, linestyle='--', color='black')
+            axes[1].set_title("Partial Autocorrelation Function (PACF)")
+            axes[1].annotate("Lag 17", (17, pacf_vals[17]), textcoords="offset points", xytext=(0,10), ha='center', color='green')
+            axes[1].annotate("Lag 18", (18, pacf_vals[18]), textcoords="offset points", xytext=(0,10), ha='center', color='green')
+
+            st.pyplot(fig)
+            st.info("📌 Berdasarkan grafik ACF dan PACF, lag yang melewati batas signifikan adalah **lag 17 dan 18**, dan lag terbaik yang dipilih adalah **lag 18**.")
+
+            # 7️⃣ Tampilkan Isi Lag 18
+            df_monthly['lag_18'] = df_monthly['Quantity'].shift(18)
+            df_lag18 = df_monthly.dropna(subset=['lag_18'])
+            st.write("### 🧾 Data dengan Lag 18")
+            st.dataframe(df_lag18[['Year', 'Month', 'lag_18', 'Quantity']])
+
+            # 8️⃣ Simpan ke Session State
+            st.session_state['processed_data'] = df_monthly
+
+    else:
+        st.warning("⚠️ Harap unggah data terlebih dahulu di bagian '📂 Upload Data'.")
     
     elif selected == '📊 Visualisasi Data Historis':
         st.title("Visualisasi Data Historis")
