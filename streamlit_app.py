@@ -155,38 +155,24 @@ def main():
         """, unsafe_allow_html=True)
 
 
+    # **📌 Tentang Aplikasi**
     elif selected == '📖 Tentang Aplikasi':
-        st.title('📊 Insight Predict - Aplikasi Prediksi Penjualan')
-        
-        st.markdown("""
-        <div style="max-width:700px; margin:auto; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color:#333;">
-            <p style="font-size:18px; line-height:1.6;">
-            Insight Predict adalah aplikasi analisis data yang dirancang untuk membantu perusahaan dalam memprediksi tren penjualan secara akurat dan efektif.
-            Dengan menggunakan <strong>model XGBoost</strong> yang dioptimasi melalui <strong>Grid Search</strong>, aplikasi ini mampu mengenali pola data historis dan memberikan prediksi kuantitas penjualan di masa depan dengan tingkat keandalan tinggi.
-            </p>
-            
-            <p style="font-size:18px; line-height:1.6;">
-            Melalui visualisasi interaktif dan fitur preprocessing data, pengguna dapat dengan mudah mengolah data penjualan bulanan, mengidentifikasi lag terbaik, dan mengevaluasi performa model prediksi.  
-            Aplikasi ini sangat berguna untuk mendukung pengambilan keputusan dalam manajemen persediaan, perencanaan produksi, dan strategi pemasaran yang lebih tepat sasaran.
-            </p>
-        </div>
-        """, unsafe_allow_html=True)
-        
+        st.title('📊 Insight Predict')
+        st.write("""
+        Insight Predict adalah platform analisis berbasis data yang dirancang untuk membantu pengguna dalam memahami tren data dan membuat prediksi berdasarkan data historis.  
+        Aplikasi ini menggunakan **model Machine Learning canggih** untuk memberikan hasil prediksi yang lebih akurat dan dapat diandalkan. Dengan visualisasi interaktif, pengguna dapat dengan mudah menginterpretasikan data, mengevaluasi hasil analisis, dan mengambil keputusan berbasis data dengan lebih baik.
+        """)
+
+        # **📌 Terms & Conditions**
         with st.expander("📜 Syarat & Ketentuan Penggunaan"):
             st.markdown("""
-            <ul style="max-width:700px; margin:auto; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color:#555; font-size:16px; line-height:1.5;">
-                <li><strong>Format Data:</strong> File Excel (.xlsx)</li>
-                <li><strong>Kolom Wajib:</strong>  
-                    <ul>
-                        <li>Tanggal Pembelian</li>
-                        <li>Jenis Produk</li>
-                        <li>Quantity (Jumlah Penjualan)</li>
-                    </ul>
-                </li>
-                <li>Data harus bersih dari missing value agar hasil prediksi optimal.</li>
-                <li>Disarankan memiliki data penjualan bulanan minimal 2 tahun agar model dapat belajar dengan baik.</li>
-            </ul>
-            """, unsafe_allow_html=True)
+            **Jenis Data yang Dapat Digunakan:**  
+            - Format **Excel (.xlsx)**
+            - Harus memiliki kolom berikut:  
+                - **Tanggal**  
+                - **Jenis Produk**  
+                - **Quantity**   
+            """)
 
 
     # **📌 Fitur Upload Data**
