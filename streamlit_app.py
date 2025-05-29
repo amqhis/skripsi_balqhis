@@ -201,30 +201,21 @@ def main():
                 st.write("### 📅 Data Agregasi Bulanan")
                 st.dataframe(df_monthly)
     
-                # 6️⃣ Buat fitur lag 18
-                df_monthly['lag_18'] = df_monthly['Quantity'].shift(18)
-                df_lag18 = df_monthly.dropna(subset=['lag_18'])
-                st.write("### 🧾 Data dengan Fitur Lag 18 dan Quantity Asli")
-                st.dataframe(df_lag18[['Year', 'Month', 'lag_18', 'Quantity']])
-    
-                # 7️⃣ Simpan ke Session State
-                st.session_state['processed_data'] = df_monthly
-    
-                # 8️⃣ Visualisasi ACF dan PACF Manual (Seperti Google Colab)
+                # 6️⃣ Visualisasi ACF dan PACF Manual (Seperti Google Colab)
                 st.write("### 🔄 Visualisasi ACF dan PACF (Manual Style)")
-                
+                st.info("📌 Lag terbaik berdasarkan PACF adalah **18**")
+    
                 from statsmodels.tsa.stattools import acf, pacf
                 import numpy as np
                 import matplotlib.pyplot as plt
-                
+    
                 lags = 20
                 acf_vals = acf(df_monthly['Quantity'], nlags=lags)
                 pacf_vals = pacf(df_monthly['Quantity'], nlags=lags)
                 threshold = 1.96 / np.sqrt(len(df_monthly))
-                
-                # Buat plot menggunakan matplotlib
+    
                 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
-                
+    
                 # Plot ACF
                 ax1.stem(range(len(acf_vals)), acf_vals, markerfmt='.', basefmt=" ", linefmt='green')
                 ax1.axhline(y=threshold, linestyle='-', color='red')
@@ -234,7 +225,7 @@ def main():
                 ax1.set_xlabel("Lag")
                 ax1.set_ylabel("ACF")
                 ax1.grid(True)
-                
+    
                 # Plot PACF
                 ax2.stem(range(len(pacf_vals)), pacf_vals, markerfmt='.', basefmt=" ", linefmt='blue')
                 ax2.axhline(y=threshold, linestyle='-', color='red')
@@ -244,14 +235,22 @@ def main():
                 ax2.set_xlabel("Lag")
                 ax2.set_ylabel("PACF")
                 ax2.grid(True)
-                
+    
                 plt.tight_layout()
                 st.pyplot(fig)
-
-
+    
+                # 7️⃣ Buat fitur lag 18 setelah visualisasi
+                df_monthly['lag_18'] = df_monthly['Quantity'].shift(18)
+                df_lag18 = df_monthly.dropna(subset=['lag_18'])
+                st.write("### 🧾 Data dengan Fitur Lag 18 dan Quantity Asli")
+                st.dataframe(df_lag18[['Year', 'Month', 'lag_18', 'Quantity']])
+    
+                # 8️⃣ Simpan ke Session State
+                st.session_state['processed_data'] = df_monthly
     
         else:
             st.warning("⚠️ Harap unggah data terlebih dahulu di bagian '📂 Upload Data'.")
+
 
 
     
