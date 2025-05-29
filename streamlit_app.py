@@ -213,17 +213,19 @@ def main():
         else:
             st.warning("⚠️ Harap unggah data terlebih dahulu di bagian '📂 Upload Data'.")
 
-   
+    
     elif selected == '📊 Visualisasi Data Historis':
+        import matplotlib.pyplot as plt  # ✅ Tambahkan ini
+    
         st.title("📊 Visualisasi Data Historis")
         if 'original_data' in st.session_state:
             df = st.session_state['original_data'].copy()
     
-            # ✅ Pastikan kolom tanggal dikonversi ke datetime
+            # Konversi tanggal
             df['Tanggal Pembelian'] = pd.to_datetime(df['Tanggal Pembelian'], errors='coerce')
             df.dropna(subset=['Tanggal Pembelian'], inplace=True)
     
-            # Visualisasi bulanan
+            # Bulanan
             df['Month'] = df['Tanggal Pembelian'].dt.to_period('M').astype(str)
             df_monthly = df.groupby('Month')['Quantity'].sum().reset_index()
             max_month = df_monthly.loc[df_monthly['Quantity'].idxmax()]
@@ -237,14 +239,14 @@ def main():
             plt.title('Tren Penjualan Per Bulan')
             st.pyplot(fig)
     
-            # Visualisasi tahunan
+            # Tahunan
             df_yearly = df.groupby(df['Tanggal Pembelian'].dt.year)['Quantity'].sum()
             fig, ax = plt.subplots()
             df_yearly.plot(kind='bar', color='skyblue', ax=ax)
             plt.title('Total Penjualan per Tahun')
             st.pyplot(fig)
     
-            # Visualisasi berdasarkan jenis
+            # Berdasarkan Jenis (jika ada)
             if 'Jenis Strapping Band' in df.columns:
                 sales_by_type = df.groupby('Jenis Strapping Band')['Quantity'].sum()
                 fig, ax = plt.subplots()
@@ -256,7 +258,6 @@ def main():
                 st.info("Kolom 'Jenis Strapping Band' tidak ditemukan dalam data.")
         else:
             st.warning("⚠️ Upload data terlebih dahulu di menu '📂 Upload Data'!")
-
 
     
     elif selected == '🔮 Prediksi Masa Depan':
