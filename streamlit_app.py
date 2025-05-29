@@ -215,35 +215,48 @@ def main():
 
    
     elif selected == '📊 Visualisasi Data Historis':
-        st.title("Visualisasi Data Historis")
+        st.title("📊 Visualisasi Data Historis")
         if 'original_data' in st.session_state:
-            df = st.session_state['original_data']
+            df = st.session_state['original_data'].copy()
+    
+            # ✅ Pastikan kolom tanggal dikonversi ke datetime
+            df['Tanggal Pembelian'] = pd.to_datetime(df['Tanggal Pembelian'], errors='coerce')
+            df.dropna(subset=['Tanggal Pembelian'], inplace=True)
+    
+            # Visualisasi bulanan
             df['Month'] = df['Tanggal Pembelian'].dt.to_period('M').astype(str)
             df_monthly = df.groupby('Month')['Quantity'].sum().reset_index()
             max_month = df_monthly.loc[df_monthly['Quantity'].idxmax()]
             min_month = df_monthly.loc[df_monthly['Quantity'].idxmin()]
-            st.write(f"Penjualan tertinggi terjadi pada {max_month['Month']} sebanyak {max_month['Quantity']} unit")
-            st.write(f"Penjualan terendah terjadi pada {min_month['Month']} sebanyak {min_month['Quantity']} unit")
+            st.write(f"📈 Penjualan tertinggi terjadi pada {max_month['Month']} sebanyak {max_month['Quantity']} unit")
+            st.write(f"📉 Penjualan terendah terjadi pada {min_month['Month']} sebanyak {min_month['Quantity']} unit")
+    
             fig, ax = plt.subplots(figsize=(12,6))
             ax.plot(df_monthly['Month'], df_monthly['Quantity'], marker='o', linestyle='-', color='b')
             plt.xticks(rotation=45)
             plt.title('Tren Penjualan Per Bulan')
             st.pyplot(fig)
-            
+    
+            # Visualisasi tahunan
             df_yearly = df.groupby(df['Tanggal Pembelian'].dt.year)['Quantity'].sum()
             fig, ax = plt.subplots()
             df_yearly.plot(kind='bar', color='skyblue', ax=ax)
             plt.title('Total Penjualan per Tahun')
             st.pyplot(fig)
-            
-            sales_by_type = df.groupby('Jenis Strapping Band')['Quantity'].sum()
-            fig, ax = plt.subplots()
-            sales_by_type.plot(kind='bar', color='green', ax=ax)
-            plt.title('Penjualan Berdasarkan Jenis Strapping Band')
-            plt.xticks(rotation=45)
-            st.pyplot(fig)
+    
+            # Visualisasi berdasarkan jenis
+            if 'Jenis Strapping Band' in df.columns:
+                sales_by_type = df.groupby('Jenis Strapping Band')['Quantity'].sum()
+                fig, ax = plt.subplots()
+                sales_by_type.plot(kind='bar', color='green', ax=ax)
+                plt.title('Penjualan Berdasarkan Jenis Strapping Band')
+                plt.xticks(rotation=45)
+                st.pyplot(fig)
+            else:
+                st.info("Kolom 'Jenis Strapping Band' tidak ditemukan dalam data.")
         else:
-            st.warning("Upload data terlebih dahulu!")
+            st.warning("⚠️ Upload data terlebih dahulu di menu '📂 Upload Data'!")
+
 
     
     elif selected == '🔮 Prediksi Masa Depan':
