@@ -249,8 +249,8 @@ def main():
     elif selected == '🔮 Prediksi Masa Depan':
         st.title("🔮 Prediksi Masa Depan")
     
-        if 'df_monthly' in st.session_state:
-            df_monthly = st.session_state['df_monthly']
+        if 'processed_data' in st.session_state:
+            df_monthly = st.session_state['processed_data']
     
             # Cek kolom yang dibutuhkan
             if {'Year', 'Month', 'Quantity'}.issubset(df_monthly.columns):
@@ -343,6 +343,7 @@ def main():
                 st.error("Data bulanan harus memiliki kolom: Year, Month, dan Quantity")
         else:
             st.info("Silakan lakukan preprocessing data terlebih dahulu di menu '📊 Data Preprocessing'")
+
 
 
 # Menjalankan aplikasi
