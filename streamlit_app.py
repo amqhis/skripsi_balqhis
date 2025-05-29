@@ -124,26 +124,23 @@ def main():
         .welcome-container {
             display: flex;
             flex-direction: column;
-            justify-content: center;  /* Vertikal center */
-            align-items: flex-end;    /* Rata kanan horizontal */
-            height: 300px;
-            padding: 20px;
+            justify-content: center;  /* Vertikal tengah */
+            align-items: center;      /* Horizontal tengah */
+            height: 300px;            /* Atur tinggi container */
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: #2c3e50;
-            background: linear-gradient(135deg, #74ebd5 0%, #ACB6E5 100%);
-            border-radius: 15px;
-            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+            color: #333333;
         }
         .welcome-text {
-            font-size: 28px;
+            font-size: 32px;
             font-weight: 700;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
         }
         .welcome-subtext {
             font-size: 18px;
             line-height: 1.5;
-            max-width: 450px;
-            text-align: right;
+            max-width: 600px;
+            text-align: center;
+            color: #555555;
         }
         </style>
     
@@ -156,6 +153,7 @@ def main():
             </div>
         </div>
         """, unsafe_allow_html=True)
+
 
 
     # **📌 Tentang Aplikasi**
