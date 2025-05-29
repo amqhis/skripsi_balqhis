@@ -210,20 +210,27 @@ def main():
                 # 7️⃣ Simpan ke Session State
                 st.session_state['processed_data'] = df_monthly
     
-                # 8️⃣ Visualisasi ACF dan PACF
-                st.write("### 🔄 Autocorrelation Function (ACF) & PACF")
-    
+                 # 8️⃣ Visualisasi ACF dan PACF
+                st.write("### 🔄 Autocorrelation Function (ACF) & Partial ACF (PACF)")
+                
                 from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
-                import matplotlib.pyplot as plt  # <== Tambahkan di sini
+                import matplotlib.pyplot as plt
                 import matplotlib.dates as mdates
-    
-                fig_acf = plt.figure(figsize=(10, 4))
-                plot_acf(df_monthly['Quantity'], lags=30)
-                st.pyplot(fig_acf)
-    
-                fig_pacf = plt.figure(figsize=(10, 4))
-                plot_pacf(df_monthly['Quantity'], lags=30, method='ywm')
-                st.pyplot(fig_pacf)
+                
+                try:
+                    if len(df_monthly['Quantity']) <= 20:
+                        st.warning("📉 Jumlah data kurang dari 21 baris, tidak bisa menampilkan ACF/PACF dengan lag 20.")
+                    else:
+                        fig_acf = plt.figure(figsize=(10, 4))
+                        plot_acf(df_monthly['Quantity'], lags=20)
+                        st.pyplot(fig_acf)
+                
+                        fig_pacf = plt.figure(figsize=(10, 4))
+                        plot_pacf(df_monthly['Quantity'], lags=20, method='ywm')
+                        st.pyplot(fig_pacf)
+                except Exception as e:
+                    st.error(f"❌ Gagal menampilkan ACF/PACF: {str(e)}")
+
     
         else:
             st.warning("⚠️ Harap unggah data terlebih dahulu di bagian '📂 Upload Data'.")
