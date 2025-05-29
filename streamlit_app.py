@@ -119,12 +119,44 @@ def main():
 
     # **📌 Kata Sambutan Muncul di Homepage**
     if selected == '🏠 Home':
-        st.markdown("<div class='welcome-text'>🎉 Hai, Selamat Datang di Insight Predict! 🎉</div>", unsafe_allow_html=True)
-        st.write("""
-        Insight Predict adalah aplikasi yang dirancang untuk membantu Anda menganalisis dan memprediksi tren data menggunakan metode berbasis **Machine Learning**.  
-        Dengan fitur interaktif yang mudah digunakan, aplikasi ini memungkinkan Anda memahami pola data historis dan melakukan prediksi masa depan dengan lebih akurat.  
-        📊 **Ayo mulai jelajahi fitur yang tersedia!** 🚀
-        """)
+        st.markdown("""
+        <style>
+        .welcome-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;  /* Vertikal center */
+            align-items: flex-end;    /* Rata kanan horizontal */
+            height: 300px;
+            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #2c3e50;
+            background: linear-gradient(135deg, #74ebd5 0%, #ACB6E5 100%);
+            border-radius: 15px;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        }
+        .welcome-text {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+        .welcome-subtext {
+            font-size: 18px;
+            line-height: 1.5;
+            max-width: 450px;
+            text-align: right;
+        }
+        </style>
+    
+        <div class="welcome-container">
+            <div class="welcome-text">🎉 Selamat Datang di <span style="color:#FF6F61;">Insight Predict</span>! 🎉</div>
+            <div class="welcome-subtext">
+                Temukan pola tersembunyi dan prediksi masa depan dengan <strong>Machine Learning</strong> yang mudah digunakan.<br><br>
+                📈 Jelajahi data historis, dapatkan insight, dan ambil keputusan lebih tepat dengan teknologi terkini.<br><br>
+                🚀 <em>Mulai petualangan data Anda sekarang!</em> ✨
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
 
     # **📌 Tentang Aplikasi**
     elif selected == '📖 Tentang Aplikasi':
