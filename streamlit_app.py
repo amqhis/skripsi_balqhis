@@ -245,15 +245,14 @@ def main():
         else:
             st.warning("Upload data terlebih dahulu!")
 
-
+    
     elif selected == '🔮 Prediksi Masa Depan':
         st.title("🔮 Prediksi Masa Depan")
     
-        uploaded_file = st.file_uploader("Upload file CSV data penjualan bulanan", type=["csv"])
+        if 'df_monthly' in st.session_state:
+            df_monthly = st.session_state['df_monthly']
     
-        if uploaded_file is not None:
-            df_monthly = pd.read_csv(uploaded_file)
-    
+            # Cek kolom yang dibutuhkan
             if {'Year', 'Month', 'Quantity'}.issubset(df_monthly.columns):
                 best_lag = 18
     
@@ -270,14 +269,14 @@ def main():
                 y_train = df_pred['Quantity'].loc[X_train.index]
     
                 # Grid search dengan parameter yang sudah diketahui terbaik
+                from xgboost import XGBRegressor
+                from sklearn.model_selection import GridSearchCV
+    
                 param_grid = {
                     'learning_rate': [0.01],
                     'max_depth': [1],
                     'min_child_weight': [13]
                 }
-    
-                from xgboost import XGBRegressor
-                from sklearn.model_selection import GridSearchCV
     
                 grid_search = GridSearchCV(
                     estimator=XGBRegressor(objective='reg:squarederror'),
@@ -341,9 +340,10 @@ def main():
                 st.pyplot(fig)
     
             else:
-                st.error("File harus memiliki kolom: Year, Month, dan Quantity")
+                st.error("Data bulanan harus memiliki kolom: Year, Month, dan Quantity")
         else:
-            st.info("Silakan upload file CSV data penjualan bulanan terlebih dahulu")
+            st.info("Silakan lakukan preprocessing data terlebih dahulu di menu '📊 Data Preprocessing'")
+
 
 # Menjalankan aplikasi
 if __name__ == "__main__":
